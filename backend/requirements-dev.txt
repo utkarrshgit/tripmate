@@ -1,0 +1,4 @@
+# Everything needed to run the backend tests: pip install -r requirements-dev.txt
+-r requirements.txt
+pytest
+pytest-asyncio
