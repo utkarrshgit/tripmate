@@ -1,4 +1,5 @@
 import re
+from datetime import date
 
 from app.agents.base import BaseAgent
 from app.agents.state import AgentState
@@ -12,7 +13,8 @@ class PlannerAgent(BaseAgent):
 
         # Simple deterministic extraction keeps the MVP usable even without an LLM.
         destination = self._extract_destination(query)
-        days = self._extract_days(query)
+        # Explicit travel dates win over a day count in the text.
+        days = self._days_from_dates(state) or self._extract_days(query)
         budget = self._extract_budget(query)
         travelers = self._extract_travelers(query)
         interests = self._extract_interests(query)
@@ -30,14 +32,33 @@ class PlannerAgent(BaseAgent):
 
         return self.mark_completed(state)
 
+    @staticmethod
+    def _days_from_dates(state: AgentState) -> int | None:
+        start, end = state.get("start_date"), state.get("end_date")
+        if not (start and end):
+            return None
+        return (date.fromisoformat(end) - date.fromisoformat(start)).days + 1
+
+    # Words that end a place name: connectors, month names, and time words.
+    _STOP_WORDS = (
+        "for|under|within|with|from|on|in|at|during|between|by|and|next|this|budget|starting|till|until|to|"
+        "jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|"
+        "sep|sept|september|oct|october|nov|november|dec|december|weekend|week|month"
+    )
+
     def _extract_destination(self, query: str) -> str:
-        patterns = [
-            r"(?:to|visit|for)\s+([A-Za-z][A-Za-z .'-]{2,40}?)(?:\s+for\s+\d+\s*(?:days?|nights?)|\s+under\s+₹?[\d,]+|\s+with\s+₹?[\d,]+|$)",
-        ]
-        for pattern in patterns:
-            match = re.search(pattern, query, re.IGNORECASE)
-            if match:
-                return match.group(1).strip(" .,")
+        """
+        The place after "to"/"visit" (or "in" as a fallback), read word by word
+        until a number, punctuation, ₹ or a stop word — so dates, budgets and
+        group sizes after the name don't break it.
+        """
+        stop = rf"(?=\s+(?:{self._STOP_WORDS})\b|\s*[\d₹,.;:!?()]|\s*$)"
+        for lead in (r"to|visit|visiting|explore", r"in"):
+            pattern = rf"\b(?:{lead})\s+([A-Za-z][A-Za-z.'-]*(?:\s+[A-Za-z][A-Za-z.'-]*){{0,3}}?){stop}"
+            for match in re.finditer(pattern, query, re.IGNORECASE):
+                name = match.group(1).strip(" .,'-")
+                if name and not re.fullmatch(rf"(?:{self._STOP_WORDS})", name, re.IGNORECASE):
+                    return name.title() if name.islower() else name
         return "Unknown destination"
 
     def _extract_days(self, query: str) -> int:

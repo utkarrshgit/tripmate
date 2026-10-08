@@ -171,6 +171,24 @@ a {
   }
 }
 
+/* Figures: the hero number a view leads with, and secondary KPI values */
+.hero-figure {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  color: var(--color-ink);
+}
+.kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+.kpi-value.c-mute {
+  color: var(--color-mute);
+}
+
 /* ---------- Layout ---------- */
 .container {
   width: 100%;

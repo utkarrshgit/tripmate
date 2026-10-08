@@ -30,10 +30,24 @@ export async function checkHealth() {
   }
 }
 
-export function planTrip(query) {
-  return request("/api/trips/plan", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ query }),
+const postJSON = (path, body) =>
+  request(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+
+/** Plans a trip. `dates` is { start, end } (ISO). Prices in the result are estimates. */
+export function planTrip(query, dates) {
+  return postJSON("/api/trips/plan", { query, start_date: dates?.start ?? null, end_date: dates?.end ?? null });
+}
+
+/**
+ * Exact prices for a planned trip, from the backend's pricing provider.
+ * Returns { status: "ok" | "unavailable", is_sample, transport[], stays[], message }.
+ */
+export function priceTrip({ destination, dates, travelers, origin }) {
+  return postJSON("/api/trips/price", {
+    destination,
+    start_date: dates.start,
+    end_date: dates.end,
+    travelers,
+    origin: origin?.trim() || null,
   });
 }

@@ -1,0 +1,185 @@
+/* Exact prices step */
+.exact-prices {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+.exact-prices > .back-link {
+  justify-self: start;
+  margin-bottom: 0;
+}
+
+.pricing-form {
+  display: grid;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  border-radius: var(--rounded-md);
+  background: var(--color-surface-card);
+}
+.origin-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--spacing-md);
+}
+.origin-form > .btn {
+  margin-top: 29px; /* align with the input under its label */
+  height: 44px;
+}
+@media (max-width: 480px) {
+  .pricing-form {
+    padding: var(--spacing-lg);
+  }
+  .origin-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .origin-form > .btn {
+    margin-top: 0;
+  }
+}
+
+/* Loading */
+.pricing-loading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+.pricing-loading-orb {
+  display: inline-grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+}
+
+.pricing-results {
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+}
+
+/* Estimate → exact comparison */
+.price-compare {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-lg) var(--spacing-xl);
+  padding: var(--spacing-xl);
+  border-radius: var(--rounded-md);
+  background: var(--color-surface-card);
+}
+.price-compare-old {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+.price-compare-delta {
+  display: grid;
+  gap: var(--spacing-xs);
+  margin-left: auto;
+  justify-items: end;
+}
+@media (max-width: 768px) {
+  .price-compare-delta {
+    margin-left: 0;
+    justify-items: start;
+    width: 100%;
+  }
+}
+
+/* Quote groups */
+.quote-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+@media (max-width: 768px) {
+  .quote-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.quote-group {
+  display: grid;
+  align-content: start;
+  gap: var(--spacing-lg);
+}
+.quote-list {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+.quote-row {
+  display: grid;
+  grid-template-columns: minmax(110px, 170px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 10px 12px;
+  border-radius: var(--rounded-md);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-base) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+.quote-row:active {
+  transform: scale(0.99);
+}
+.quote-row.is-selected {
+  background: var(--color-canvas);
+}
+/* Keyboard focus only — a mouse click on a row shouldn't draw the ring */
+.quote-row:has(input:focus-visible) {
+  box-shadow: 0 0 0 2px var(--color-focus-inner), 0 0 0 4px var(--color-focus-outer);
+}
+.quote-label {
+  display: grid;
+}
+.quote-tag {
+  margin-left: var(--spacing-xs);
+  padding: 2px 8px;
+  border-radius: var(--rounded-full);
+  background: var(--color-success-pale);
+  color: var(--color-success-deep);
+  font-size: 11px;
+  font-weight: 700;
+}
+.quote-bar {
+  height: 8px;
+  border-radius: var(--rounded-full);
+  background: var(--color-canvas);
+}
+.quote-row.is-selected .quote-bar {
+  background: var(--color-surface-card);
+}
+.quote-bar span {
+  display: block;
+  height: 100%;
+  border-radius: var(--rounded-full);
+  background: var(--color-stone);
+  transform-origin: left center;
+  animation: grow-x 600ms var(--motion-ease) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+  transition: background-color var(--motion-base) var(--motion-ease);
+}
+.quote-row.is-selected .quote-bar span {
+  background: var(--color-ink);
+}
+.quote-price {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-xxs);
+  min-width: 88px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-mute);
+}
+.quote-row.is-selected .quote-price {
+  color: var(--color-ink);
+}
+@media (max-width: 480px) {
+  .quote-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: var(--spacing-xs);
+  }
+  .quote-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

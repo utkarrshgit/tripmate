@@ -6,18 +6,18 @@ import { rememberPlan } from "@/state/session";
 /**
  * Runs a trip request against the API.
  * status: "idle" | "planning" | "done" | "error" | "unavailable"
- * onDone(plan, query) fires once the plan is ready.
+ * run(query, dates) — dates is { start, end } (ISO). onDone(plan, query) fires once the plan is ready.
  */
 export function usePlanRequest(onDone) {
   const [status, setStatus] = useState("idle");
   const [error, setError] = useState("");
 
   const run = useCallback(
-    async (query) => {
+    async (query, dates) => {
       setStatus("planning");
       setError("");
       try {
-        const plan = await withDemoDelay(planTrip(query), DEMO_DELAYS.planningMs);
+        const plan = await withDemoDelay(planTrip(query, dates), DEMO_DELAYS.planningMs);
         rememberPlan(plan, query);
         setStatus("done");
         onDone(plan, query);

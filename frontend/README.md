@@ -28,8 +28,9 @@ src/
                     navLinks.js ← nav, drawer and footer links
   features/         One folder per area; each owns its components, logic and CSS
     home/             home page sections + content.js (copy)
-    planner/          request form, interest chips, detail checklist,
-                      planning progress, usePlanRequest, requestDetails.js
+    planner/          request form, date range (dateParsing.js reads dates from text),
+                      interest chips, detail checklist, planning progress, usePlanRequest
+    pricing/          exact-prices step: origin form, quote lists, estimate vs exact
     trips/            TripPlanView + sections/, TripCard, skeletons
     auth/             sign-up/log-in modal, SignedOutPrompt, validation
     account/          profile form, data controls
@@ -53,6 +54,7 @@ Import from `src` with the `@/` alias, e.g. `import { Button } from "@/component
 | Add a section to the trip plan | Create a component in `features/trips/sections/` that takes `{ plan, query, onEditRequest }` and returns `null` when it has no data, then add it to `TRIP_SECTIONS` in `sections/index.js`. |
 | Add photos | Put files in `public/images/` and set their paths in `data/images.js`. Empty slots render as cream cards at the right ratio. |
 | Change legal text | Edit `features/legal/content/*.jsx`. |
+| Change how dates are read from text | `features/planner/dateParsing.js`: pure functions; add a rule to `RULES`. |
 | Add a destination or interest | `data/catalog.js`. Interests must match the backend parser's keywords. |
 | Show AI activity somewhere new | Use `<AgentOrb state="…">` (or `<PlannerOrb planner={…}>` for a backend planner) from `@/components/ui`. Each planner's state lives in `PLANNERS` in `data/catalog.js`. |
 | Hook up real auth / saved trips | Replace the localStorage functions in `state/session.jsx`; components only use `useSession()`. |

@@ -114,17 +114,24 @@ export function SessionProvider({ children }) {
     [user],
   );
 
+  // `pricing` (optional) is an exact-price check: { origin, response, selection, checkedAt }.
   const saveTrip = useCallback(
-    (plan, query) => {
+    (plan, query, pricing = null) => {
       const trip = {
         id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
         query,
         plan,
+        pricing,
         savedAt: new Date().toISOString(),
       };
       persistTrips([trip, ...trips]);
       return trip;
     },
+    [trips, persistTrips],
+  );
+
+  const updateTrip = useCallback(
+    (id, patch) => persistTrips(trips.map((t) => (t.id === id ? { ...t, ...patch } : t))),
     [trips, persistTrips],
   );
 
@@ -145,10 +152,11 @@ export function SessionProvider({ children }) {
       updateProfile,
       deleteAccount,
       saveTrip,
+      updateTrip,
       deleteTrip,
       exportData,
     }),
-    [user, trips, authModal, signUp, logIn, logOut, updateProfile, deleteAccount, saveTrip, deleteTrip, exportData],
+    [user, trips, authModal, signUp, logIn, logOut, updateProfile, deleteAccount, saveTrip, updateTrip, deleteTrip, exportData],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;
@@ -176,5 +184,24 @@ export function recallPlan() {
     return JSON.parse(sessionStorage.getItem(LAST_PLAN_KEY)) ?? null;
   } catch {
     return null;
+  }
+}
+
+// Where the viewer usually travels from — a per-browser convenience for the exact-prices form.
+const ORIGIN_KEY = "tripmate:origin";
+
+export function rememberOrigin(origin) {
+  try {
+    localStorage.setItem(ORIGIN_KEY, origin);
+  } catch {
+    // Non-critical.
+  }
+}
+
+export function recallOrigin() {
+  try {
+    return localStorage.getItem(ORIGIN_KEY) ?? "";
+  } catch {
+    return "";
   }
 }

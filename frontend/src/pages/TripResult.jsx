@@ -4,29 +4,44 @@ import { Button, SystemPage } from "@/components/ui";
 import { TripPlanView } from "@/features/trips";
 import { recallPlan, useSession } from "@/state/session";
 
-function SaveAction({ plan, query }) {
+/**
+ * The results page's next steps. Exact prices are the main one; saving comes second.
+ * Logged out, the nav's red Sign up is the fold's one red CTA, so nothing here is red.
+ */
+function TripActions({ plan, query }) {
   const { user, openAuth, saveTrip } = useSession();
   const [saved, setSaved] = useState(null);
 
-  // Logged out, the nav's red Sign up is this fold's one red CTA.
+  const exact = (
+    <Button as={Link} to="/trip/prices" state={{ plan, query }} variant={user ? "primary" : "secondary"} icon="wallet">
+      Get exact prices
+    </Button>
+  );
+  let save;
   if (!user) {
-    return (
+    save = (
       <Button icon="bookmark" onClick={() => openAuth("signup")}>
         Sign up to save
       </Button>
     );
-  }
-  if (saved) {
-    return (
+  } else if (saved) {
+    save = (
       <Button as={Link} to={`/trips/${saved.id}`} icon="check" className="swap-in">
         Saved — view in My trips
       </Button>
     );
+  } else {
+    save = (
+      <Button icon="bookmark" onClick={() => setSaved(saveTrip(plan, query))}>
+        Save trip
+      </Button>
+    );
   }
   return (
-    <Button variant="primary" icon="bookmark" onClick={() => setSaved(saveTrip(plan, query))}>
-      Save trip
-    </Button>
+    <>
+      {exact}
+      {save}
+    </>
   );
 }
 
@@ -52,7 +67,7 @@ export default function TripResult() {
 
   return (
     <div className="container section">
-      <TripPlanView plan={plan} query={query} primaryAction={<SaveAction plan={plan} query={query} />} />
+      <TripPlanView plan={plan} query={query} primaryAction={<TripActions plan={plan} query={query} />} />
     </div>
   );
 }

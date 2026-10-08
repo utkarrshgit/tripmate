@@ -2,7 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.schemas.pricing import PriceRequest, PriceResponse
 from app.schemas.trip import TripRequest, TripResponse
+from app.services.pricing_service import PricingService
 from app.services.trip_service import TripService
 
 app = FastAPI(
@@ -20,6 +22,7 @@ app.add_middleware(
 )
 
 trip_service = TripService()
+pricing_service = PricingService()
 
 
 @app.get("/health")
@@ -29,7 +32,7 @@ async def health():
 
 @app.post("/api/trips/plan", response_model=TripResponse)
 async def plan_trip(request: TripRequest):
-    result = await trip_service.plan_trip(request.query)
+    result = await trip_service.plan_trip(request.query, start_date=request.start_date, end_date=request.end_date)
 
     return TripResponse(
         destination=result.get("destination", ""),
@@ -41,6 +44,8 @@ async def plan_trip(request: TripRequest):
         issues=result.get("issues", []),
         completed_agents=result.get("completed_agents", []),
         final_response=result.get("final_response", ""),
+        start_date=result.get("start_date"),
+        end_date=result.get("end_date"),
         interests=result.get("interests", []),
         destination_info=result.get("destination_info", {}),
         transport_options=result.get("transport_options", []),
@@ -54,3 +59,9 @@ async def plan_trip(request: TripRequest):
             "food": result.get("estimated_food_cost", 0),
         },
     )
+
+
+@app.post("/api/trips/price", response_model=PriceResponse)
+async def price_trip(request: PriceRequest):
+    """Exact prices for a planned trip. Plans themselves only carry estimates."""
+    return await pricing_service.price_trip(request)
