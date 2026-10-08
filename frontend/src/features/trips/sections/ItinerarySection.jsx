@@ -1,4 +1,5 @@
 import { Icon, Reveal, Section, Tile, TileGrid } from "@/components/ui";
+import { formatDay } from "@/utils/format";
 import { DAY_PARTS } from "../tripMeta";
 
 /** Parts of the day that are identical on every day get shown once, not repeated per card. */
@@ -29,9 +30,12 @@ export default function ItinerarySection({ plan }) {
       <TileGrid ordered columns={4}>
         {days.map((day) => (
           <Tile key={day.day} className="day-card">
-            <span className="day-number" aria-label={`Day ${day.day}`}>
-              {String(day.day).padStart(2, "0")}
-            </span>
+            <div className="day-head">
+              <span className="day-number" aria-label={`Day ${day.day}`}>
+                {String(day.day).padStart(2, "0")}
+              </span>
+              {day.date && <span className="t-body-sm-strong c-mute">{formatDay(day.date)}</span>}
+            </div>
             <ul className="stack-sm">
               {varying.map((part) => (
                 <li key={part.key} className="day-part">

@@ -8,7 +8,11 @@ import { TRIP_SECTIONS, TripHero } from "./sections";
  */
 export default function TripPlanView({ plan, query, eyebrow, primaryAction, extraActions }) {
   const navigate = useNavigate();
-  const onEditRequest = () => navigate("/plan", { state: { query } });
+  // Back to the form with the request and the trip's dates, so nothing has to be re-entered.
+  const onEditRequest = () =>
+    navigate("/plan", {
+      state: { query, dates: plan.start_date ? { start: plan.start_date, end: plan.end_date } : null },
+    });
 
   const actions = (
     <>

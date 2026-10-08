@@ -21,7 +21,11 @@ export default function TripCard({ trip, ratio, onDelete }) {
             icon="refresh"
             size={18}
             label={`Plan ${plan.destination} again`}
-            onClick={() => navigate("/plan", { state: { query: trip.query } })}
+            onClick={() =>
+              navigate("/plan", {
+                state: { query: trip.query, run: true, dates: plan.start_date ? { start: plan.start_date, end: plan.end_date } : null },
+              })
+            }
           />
           <IconButton icon="trash" size={18} label={`Delete ${plan.destination} trip`} onClick={() => onDelete(trip)} />
         </span>

@@ -1,3 +1,5 @@
+from datetime import date
+
 from app.agents.state import AgentState
 from app.agents.planner import PlannerAgent
 from app.agents.destination_agent import DestinationAgent
@@ -32,7 +34,7 @@ class SupervisorAgent:
         self.itinerary = ItineraryAgent()
         self.critic = CriticAgent()
 
-    async def run(self, user_query: str) -> AgentState:
+    async def run(self, user_query: str, *, start_date: date | None = None, end_date: date | None = None) -> AgentState:
         state: AgentState = {
             "user_query": user_query,
             "destination": "",
@@ -44,6 +46,9 @@ class SupervisorAgent:
             "issues": [],
             "final_response": "",
         }
+        if start_date and end_date:
+            state["start_date"] = start_date.isoformat()
+            state["end_date"] = end_date.isoformat()
 
         # 1. Understand the request.
         state = await self.planner.run(state)

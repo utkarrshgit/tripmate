@@ -47,6 +47,46 @@
   margin-bottom: var(--spacing-lg);
 }
 
+/* When: date range */
+.date-range {
+  /* keep the form's stack spacing on top */
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  padding: 0;
+  border: 0;
+}
+.date-range legend {
+  margin-bottom: var(--spacing-md);
+  padding: 0;
+}
+.date-range-inputs {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+}
+.date-input {
+  display: grid;
+  flex: 1;
+  gap: var(--spacing-xxs);
+}
+.date-input .input {
+  min-width: 0;
+}
+.date-range-arrow {
+  flex: none;
+  margin-bottom: 13px;
+}
+@media (max-width: 480px) {
+  .date-range-arrow {
+    display: none;
+  }
+  .date-range-inputs {
+    gap: var(--spacing-sm);
+  }
+}
+
 /* Planning progress */
 .planning {
   display: grid;

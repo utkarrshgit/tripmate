@@ -60,13 +60,8 @@
   align-items: baseline;
   gap: var(--spacing-sm);
 }
-/* Hero figure: the number the page leads with */
-.hero-figure {
-  font-size: 44px;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.8px;
-  color: var(--color-ink);
+.estimate-tag {
+  margin-left: auto;
 }
 .meter {
   position: relative;
@@ -104,12 +99,6 @@
 .kpi-row dd {
   margin: 0;
 }
-.kpi-value {
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.2;
-  color: var(--color-ink);
-}
 
 .trip-issues {
   display: grid;
@@ -137,6 +126,12 @@
   flex-direction: column;
   gap: var(--spacing-lg);
   min-height: 150px;
+}
+.day-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
 }
 .day-number {
   font-size: 44px;
@@ -355,6 +350,11 @@
   margin: var(--spacing-lg) 0 0;
   font-family: inherit;
   white-space: pre-wrap;
+}
+
+/* Saved trip: summary of a previous exact-price check */
+.saved-pricing {
+  margin-bottom: var(--spacing-xl);
 }
 
 /* ---------- Saved trip pins ---------- */

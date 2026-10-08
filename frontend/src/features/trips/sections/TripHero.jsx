@@ -1,15 +1,26 @@
-import { Chip, ChipStrip, Icon, PinCard } from "@/components/ui";
+import { Chip, ChipStrip, Icon, PinCard, StatusPill } from "@/components/ui";
 import { imageForDestination } from "@/data/images";
-import { plural, rupees } from "@/utils/format";
+import { formatDateRange, plural, rupees } from "@/utils/format";
 import { titleCase } from "../tripMeta";
+
+/** Plans only ever carry estimates; exact prices are a separate step. */
+function EstimateTag() {
+  return (
+    <StatusPill icon="info" className="estimate-tag">
+      Estimate
+    </StatusPill>
+  );
+}
 
 /** Total against budget as a meter: fill = spend, tick = budget (DESIGN.md: ink, error for over). */
 function BudgetMeter({ total, budget }) {
   if (!budget) {
     return (
       <div className="budget-meter">
-        <p className="hero-figure">{rupees(total)}</p>
-        <p className="t-body-sm c-mute">estimated total</p>
+        <div className="budget-meter-head">
+          <p className="hero-figure">{rupees(total)}</p>
+          <EstimateTag />
+        </div>
       </div>
     );
   }
@@ -23,6 +34,7 @@ function BudgetMeter({ total, budget }) {
       <div className="budget-meter-head">
         <p className="hero-figure">{rupees(total)}</p>
         <p className="t-body-sm c-mute">of {rupees(budget)}</p>
+        <EstimateTag />
       </div>
       <div
         className={`meter${over ? " is-over" : ""}`}
@@ -61,7 +73,9 @@ export default function TripHero({ plan, query, eyebrow, actions }) {
           <h1 className="t-display-lg">{plan.destination || "Your trip"}</h1>
           <ChipStrip>
             <Chip>
-              <Icon name="calendar" size={16} /> {plural(plan.days, "day")}
+              <Icon name="calendar" size={16} />{" "}
+              {plan.start_date ? `${formatDateRange(plan.start_date, plan.end_date)} · ` : ""}
+              {plural(plan.days, "day")}
             </Chip>
             <Chip>
               <Icon name="user" size={16} /> {plural(plan.travelers, "traveler")}
