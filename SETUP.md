@@ -2,6 +2,35 @@
 
 This gets the API and the website running locally, then checks everything works. It takes about 10 minutes.
 
+## Quick start: one command
+
+After installing the [prerequisites](#1-install-the-prerequisites) and [getting the code](#2-get-the-code), from the `tripmate` folder run:
+
+```bash
+./run.sh
+```
+
+It installs everything the first time (and skips that on later runs), creates `backend/.env`, starts the API and the website, and prints the address to open. **Ctrl+C stops both.**
+
+| Command | What it does |
+|---|---|
+| `./run.sh` | Set up if needed, then start the API and the website |
+| `./run.sh setup` | Install everything without starting |
+| `./run.sh test` | Run the backend tests and check the website builds |
+
+It handles the common problems for you:
+- **Missing or too-old Python or Node:** stops with a download link.
+- **Changed dependencies:** reinstalls only what changed.
+- **`npm ci` fails:** falls back to `npm install`.
+- **Busy ports:** uses the next free one and points the website at the right API.
+- **API fails to start:** shows the error.
+
+API logs go to `.run/api.log`.
+
+> **Windows:** run it from **Git Bash** or **WSL**. In plain PowerShell, follow the manual steps below.
+
+## Manual setup
+
 TripMate has two parts that run side by side:
 
 | Part | Folder | Runs at |
