@@ -1,0 +1,102 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+.container {
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 24px;
+}
+
+h1 {
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #697386;
+}
+
+.planner,
+.result,
+.day {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 14px;
+  border: 1px solid #d8dce5;
+  border-radius: 12px;
+  font-size: 16px;
+}
+
+button {
+  margin-top: 12px;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.result {
+  margin-top: 24px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stats div {
+  background: #f5f7fb;
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.stats b,
+.stats span {
+  display: block;
+}
+
+.stats span {
+  color: #697386;
+  margin-top: 4px;
+}
+
+.day {
+  margin: 12px 0;
+  border: 1px solid #edf0f5;
+  box-shadow: none;
+}
+
+.agents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.agents span {
+  background: #eef2ff;
+  padding: 7px 10px;
+  border-radius: 999px;
+}
+
+.error {
+  margin-top: 20px;
+  padding: 14px;
+  background: #ffecec;
+  border-radius: 10px;
+}
