@@ -1,0 +1,27 @@
+.system-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-xxl) 0;
+}
+.system-page > * {
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+}
+.system-page > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.system-page > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.system-page-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+}
+.system-page-icon > svg {
+  animation: wiggle 900ms var(--motion-ease) 400ms 1;
+}

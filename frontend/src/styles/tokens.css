@@ -1,0 +1,84 @@
+/*
+ * Design tokens — a 1:1 transcription of the front matter in /DESIGN.md.
+ * Change values there first, then mirror them here.
+ */
+:root {
+  /* colors */
+  --color-primary: #e60023;
+  --color-on-primary: #ffffff;
+  --color-primary-pressed: #cc001f;
+  --color-ink: #000000;
+  --color-ink-soft: #211922;
+  --color-body: #33332e;
+  --color-charcoal: #262622;
+  --color-mute: #62625b;
+  --color-ash: #91918c;
+  --color-stone: #c8c8c1;
+  --color-hairline: #dadad3;
+  --color-hairline-soft: #e5e5e0;
+  --color-on-secondary: #000000;
+  --color-secondary-bg: #e5e5e0;
+  --color-secondary-pressed: #c8c8c1;
+  --color-canvas: #ffffff;
+  --color-surface-soft: #fbfbf9;
+  --color-surface-card: #f6f6f3;
+  --color-surface-elevated: #ffffff;
+  --color-on-dark: #ffffff;
+  --color-on-dark-mute: rgba(255, 255, 255, 0.7);
+  --color-surface-dark: #262622;
+  --color-focus-outer: #435ee5;
+  --color-focus-inner: #ffffff;
+  --color-accent-pressed-blue: #617bff;
+  --color-accent-purple: #7e238b;
+  --color-accent-purple-deep: #6845ab;
+  --color-success-deep: #103c25;
+  --color-success-pale: #c7f0da;
+  --color-error: #9e0a0a;
+  --color-error-deep: #cc001f;
+
+  /* typography — Pin Sans with DESIGN.md's documented fallback stack (Inter first) */
+  --font-pin-sans: "Pin Sans", Inter, -apple-system, system-ui, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
+
+  /* rounded */
+  --rounded-none: 0px;
+  --rounded-sm: 8px;
+  --rounded-md: 16px;
+  --rounded-lg: 32px;
+  --rounded-full: 9999px;
+
+  /* spacing */
+  --spacing-xxs: 4px;
+  --spacing-xs: 6px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-xxl: 32px;
+  --spacing-section: 64px;
+
+  /* layout */
+  --container-max: 1280px;
+  --container-gutter: 24px;
+  --nav-height: 64px;
+  --grid-gutter: var(--spacing-sm);
+
+  /* elevation level 2 — the only shadow in the system */
+  --modal-scrim: rgba(0, 0, 0, 0.5);
+  --modal-shadow: 0 0 16px rgba(0, 0, 0, 0.16);
+}
+
+/* Responsive behavior table in DESIGN.md */
+@media (max-width: 768px) {
+  :root {
+    --spacing-section: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --spacing-section: 32px;
+    --container-gutter: 16px;
+    --grid-gutter: 6px;
+  }
+}

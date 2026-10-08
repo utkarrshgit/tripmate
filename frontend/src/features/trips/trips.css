@@ -1,0 +1,381 @@
+/* Trips feature: the trip plan as a visual analysis — numbers, meters and bars over prose. */
+
+/* ---------- Hero ---------- */
+.trip-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: center;
+  gap: var(--spacing-xxl);
+}
+.trip-hero-body > * {
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+}
+.trip-hero-body > :nth-child(2) {
+  animation-delay: 60ms;
+}
+.trip-hero-body > :nth-child(3) {
+  animation-delay: 120ms;
+}
+.trip-hero-body > :nth-child(4) {
+  animation-delay: 170ms;
+}
+.trip-hero-body > :nth-child(5) {
+  animation-delay: 210ms;
+}
+.trip-query {
+  max-width: 600px;
+}
+@media (max-width: 768px) {
+  .trip-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .trip-hero-media > * {
+    aspect-ratio: 16 / 10 !important;
+  }
+}
+
+/* Budget meter + KPI row */
+.trip-numbers {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  border-radius: var(--rounded-md);
+  background: var(--color-surface-card);
+}
+@media (max-width: 480px) {
+  .trip-numbers {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--spacing-lg);
+  }
+}
+.budget-meter {
+  display: grid;
+  gap: var(--spacing-sm);
+}
+.budget-meter-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+/* Hero figure: the number the page leads with */
+.hero-figure {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.8px;
+  color: var(--color-ink);
+}
+.meter {
+  position: relative;
+  height: 10px;
+  border-radius: var(--rounded-full);
+  background: var(--color-secondary-bg);
+}
+.meter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--rounded-full);
+  background: var(--color-ink);
+  transform-origin: left center;
+  animation: grow-x 900ms var(--motion-ease) 250ms both;
+}
+.meter.is-over .meter-fill {
+  background: var(--color-error);
+}
+/* Budget tick: a 2px canvas-ringed marker at the limit */
+.meter-tick {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: var(--rounded-full);
+  background: var(--color-ink);
+  box-shadow: 0 0 0 2px var(--color-surface-card);
+}
+.kpi-row {
+  display: flex;
+  gap: var(--spacing-xl);
+  margin: 0;
+}
+.kpi-row dd {
+  margin: 0;
+}
+.kpi-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+
+.trip-issues {
+  display: grid;
+  gap: var(--spacing-xs);
+}
+
+/* ---------- Your days ---------- */
+.day-routine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+.day-routine-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: 8px 14px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+}
+.day-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  min-height: 150px;
+}
+.day-number {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.8px;
+  color: var(--color-ink);
+}
+.day-part {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+.day-part svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+/* ---------- Spend: one stacked bar + direct labels ---------- */
+.spend {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+.spend-bar {
+  display: flex;
+  gap: 2px; /* surface gap between fills */
+  height: 20px;
+}
+.spend-bar span {
+  flex-basis: 0;
+  min-width: 6px;
+  border-radius: 4px;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.spend-bar span:first-child {
+  border-radius: var(--rounded-full) 4px 4px var(--rounded-full);
+}
+.spend-bar span:last-child {
+  border-radius: 4px var(--rounded-full) var(--rounded-full) 4px;
+}
+.is-visible .spend-bar span {
+  transform: none;
+  transition: transform 600ms var(--motion-ease);
+  transition-delay: calc(var(--i, 0) * 90ms + 100ms);
+}
+.spend-legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--spacing-lg);
+}
+.spend-item {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  grid-template-areas:
+    "swatch icon label"
+    "value value value"
+    "share share share";
+  align-items: center;
+  column-gap: var(--spacing-xs);
+}
+.spend-swatch {
+  grid-area: swatch;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--rounded-full);
+}
+.spend-item > svg {
+  grid-area: icon;
+}
+.spend-item > .t-body-sm {
+  grid-area: label;
+}
+.spend-value {
+  grid-area: value;
+  margin-top: var(--spacing-xs);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+.spend-item > .t-caption-md {
+  grid-area: share;
+}
+@media (max-width: 768px) {
+  .spend-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Options: emphasis bars ---------- */
+.option-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+@media (max-width: 768px) {
+  .option-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.option-group {
+  display: grid;
+  gap: var(--spacing-lg);
+}
+.option-row {
+  display: grid;
+  grid-template-columns: minmax(96px, 150px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.option-label {
+  display: grid;
+}
+@media (max-width: 480px) {
+  /* Phones: label and price on one line, the bar full-width beneath */
+  .option-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: var(--spacing-xs);
+  }
+  .option-bar {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
+.option-bar {
+  height: 8px;
+  border-radius: var(--rounded-full);
+  background: var(--color-canvas);
+}
+.option-bar span {
+  display: block;
+  height: 100%;
+  border-radius: var(--rounded-full);
+  background: var(--color-stone);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+.option-row.is-picked .option-bar span {
+  background: var(--color-ink);
+}
+.is-visible .option-bar span {
+  transform: none;
+  transition: transform 600ms var(--motion-ease);
+  transition-delay: calc(var(--i, 0) * 90ms + 150ms);
+}
+.option-price {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  min-width: 84px;
+  justify-content: flex-end;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-mute);
+}
+.option-row.is-picked .option-price {
+  color: var(--color-ink);
+}
+.option-key {
+  margin-top: var(--spacing-md);
+}
+
+/* ---------- Planned by (footer line) ---------- */
+.planned-by {
+  display: grid;
+  gap: var(--spacing-md);
+}
+.summary-details summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-md);
+  list-style: none;
+  cursor: pointer;
+}
+.summary-details summary::-webkit-details-marker {
+  display: none;
+}
+.planned-by-orbs {
+  display: inline-flex;
+}
+.planned-by-orb {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin-left: -6px;
+  border: 2px solid var(--color-surface-card);
+  border-radius: var(--rounded-full);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+.planned-by-orb .agent-orb.is-paused {
+  opacity: 1;
+}
+.planned-by-orb:first-child {
+  margin-left: 0;
+}
+.planned-by-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  margin-left: auto;
+}
+.planned-by-toggle svg {
+  transition: transform var(--motion-base) var(--motion-ease);
+}
+.summary-details[open] .planned-by-toggle svg {
+  transform: rotate(180deg);
+}
+.summary-details[open] .summary-text {
+  animation: rise-in var(--motion-base) var(--motion-ease) both;
+}
+.summary-text {
+  margin: var(--spacing-lg) 0 0;
+  font-family: inherit;
+  white-space: pre-wrap;
+}
+
+/* ---------- Saved trip pins ---------- */
+.pin-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.pin-actions {
+  gap: var(--spacing-xs);
+}
+
+.skeleton-gap {
+  margin-top: var(--spacing-xl);
+}
+
+@media print {
+  .trip-hero-media {
+    display: none;
+  }
+  .trip-hero {
+    grid-template-columns: 1fr;
+  }
+}

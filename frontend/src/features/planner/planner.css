@@ -1,0 +1,127 @@
+/* Planner feature: request form, checklist, planning progress */
+.trip-request-form {
+  margin-top: var(--spacing-xxl);
+}
+
+.interest-picker {
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  padding: 0;
+  border: 0;
+}
+.interest-picker legend {
+  margin-bottom: var(--spacing-md);
+  padding: 0;
+}
+
+.detail-checklist ul {
+  margin-top: var(--spacing-sm);
+}
+.detail-check {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 10px 0;
+  color: var(--color-ash);
+  transition: color var(--motion-base) var(--motion-ease);
+}
+.detail-check.is-found {
+  color: var(--color-success-deep);
+}
+.detail-check-icon {
+  display: inline-grid;
+}
+.detail-check.is-found .detail-check-icon {
+  animation: pop var(--motion-base) var(--motion-ease) both;
+}
+.detail-check-hint {
+  text-align: right;
+}
+
+.planner-examples {
+  margin-top: var(--spacing-section);
+}
+.planner-echo {
+  margin-bottom: var(--spacing-lg);
+}
+
+/* Planning progress */
+.planning {
+  display: grid;
+  gap: var(--spacing-xl);
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+}
+.planning-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+/* The current planner's orb, on a canvas disc; it cross-fades as planners hand over */
+.planning-head-orb {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--rounded-full);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  animation: scale-in var(--motion-base) var(--motion-ease) both;
+}
+.planning-caption {
+  animation: fade-in var(--motion-base) var(--motion-ease) both;
+}
+.planning-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-sm);
+}
+.planning-step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-radius: var(--rounded-md);
+  background: var(--color-canvas);
+  color: var(--color-ash);
+  transition: color var(--motion-base) var(--motion-ease);
+}
+.planning-step-icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+}
+.planning-step.is-active {
+  color: var(--color-ink);
+}
+.planning-step.is-active .planning-step-icon {
+  background: var(--color-surface-card);
+}
+.planning-step.is-done {
+  color: var(--color-success-deep);
+}
+.planning-step.is-done .planning-step-icon {
+  background: var(--color-success-pale);
+  animation: pop var(--motion-base) var(--motion-ease) both;
+}
+@media (max-width: 768px) {
+  .planning-steps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 480px) {
+  .planning-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Skeleton preview of the results, shown under the progress card */
+.planning-preview {
+  margin-top: var(--spacing-xxl);
+}

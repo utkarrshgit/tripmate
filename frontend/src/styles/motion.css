@@ -1,0 +1,150 @@
+/*
+ * Motion. DESIGN.md defines no motion tokens, so these stay deliberately small:
+ * short durations, one easing curve, movement of a few pixels, nothing looping
+ * except loading indicators and the 404 illustration's slow float. DESIGN.md also documents no hover states, so no
+ * animation here is triggered by hover — only by entering, pressing, focusing,
+ * opening or loading.
+ */
+:root {
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-slow: 320ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --motion-rise: 8px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-rise));
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes scale-out {
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes sheet-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+}
+
+/* Skeleton pulse: a flat colour shift between two neutrals (DESIGN.md: no gradients) */
+@keyframes skeleton-pulse {
+  50% {
+    background-color: var(--color-hairline-soft);
+  }
+}
+
+@keyframes bob {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes wiggle {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-14deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* Page transition: each route's content rises in on navigation. */
+.page-enter {
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+}
+
+/* Scroll reveal (see components/ui/Reveal.jsx). Items stagger via --reveal-index. */
+.reveal {
+  opacity: 0;
+  transform: translateY(var(--motion-rise));
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--motion-slow) var(--motion-ease),
+    transform var(--motion-slow) var(--motion-ease);
+  transition-delay: calc(min(var(--reveal-index, 0), 8) * 40ms);
+}
+
+/* Anything that changes state with a short cross-fade. */
+.swap-in {
+  animation: pop var(--motion-base) var(--motion-ease) both;
+}
+
+@media print {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}

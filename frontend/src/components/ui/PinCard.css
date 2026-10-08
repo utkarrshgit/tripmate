@@ -1,0 +1,102 @@
+/* pin-card / pin-card-large / pin-overlay-pill */
+.pin-card {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  border-radius: var(--rounded-md);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+}
+.pin-card-large {
+  border-radius: var(--rounded-lg);
+}
+
+.pin-card-target {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+.pin-card-target:active {
+  transform: scale(0.985);
+}
+/* overflow:hidden would clip an outer ring, so pins take the focus stack inset */
+.pin-card-target:focus-visible {
+  box-shadow: inset 0 0 0 4px var(--color-focus-outer), inset 0 0 0 6px var(--color-focus-inner);
+}
+
+.pin-img,
+.pin-slot {
+  width: 100%;
+  height: 100%;
+}
+.pin-img {
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--motion-slow) var(--motion-ease);
+}
+.pin-img.is-loaded {
+  opacity: 1;
+}
+.pin-loading {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+/* Empty image slot */
+.pin-slot {
+  display: grid;
+  place-items: center;
+  color: var(--color-stone);
+}
+
+/* Overlay pills float in the corners; clicks fall through to the pin except on real controls. */
+.pin-overlays {
+  position: absolute;
+  inset: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.pin-overlays,
+.pin-overlays * {
+  pointer-events: none;
+}
+.pin-overlays button,
+.pin-overlays a {
+  pointer-events: auto;
+}
+.pin-overlay-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-xs);
+}
+.pin-overlay-row.is-top {
+  align-items: flex-start;
+}
+
+.pin-overlay-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: var(--rounded-full);
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

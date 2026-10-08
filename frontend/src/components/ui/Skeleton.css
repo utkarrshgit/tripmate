@@ -1,0 +1,33 @@
+.skeleton {
+  display: block;
+  background-color: var(--color-surface-card);
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+.skeleton-md {
+  border-radius: var(--rounded-md);
+}
+.skeleton-lg {
+  border-radius: var(--rounded-lg);
+}
+.skeleton-full {
+  border-radius: var(--rounded-full);
+}
+
+.skeleton-text {
+  display: grid;
+  gap: 10px;
+}
+.skeleton-text > .skeleton {
+  height: 12px;
+}
+.skeleton-text-lg > .skeleton {
+  height: 18px;
+}
+.skeleton-text-xl > .skeleton {
+  height: 36px;
+}
+
+/* Skeleton screens fade in a beat late so instant loads never flash grey. */
+.skeleton-screen {
+  animation: fade-in var(--motion-base) var(--motion-ease) 150ms both;
+}

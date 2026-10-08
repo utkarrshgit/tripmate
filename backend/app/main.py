@@ -41,4 +41,16 @@ async def plan_trip(request: TripRequest):
         issues=result.get("issues", []),
         completed_agents=result.get("completed_agents", []),
         final_response=result.get("final_response", ""),
+        interests=result.get("interests", []),
+        destination_info=result.get("destination_info", {}),
+        transport_options=result.get("transport_options", []),
+        hotel_options=result.get("hotel_options", []),
+        activities=result.get("activities", []),
+        food_options=result.get("food_options", []),
+        cost_breakdown={
+            "transport": result.get("estimated_transport_cost", 0),
+            "hotel": result.get("estimated_hotel_cost", 0),
+            "activities": result.get("estimated_activity_cost", 0),
+            "food": result.get("estimated_food_cost", 0),
+        },
     )

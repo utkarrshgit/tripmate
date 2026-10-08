@@ -1,0 +1,28 @@
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-primary);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+.wordmark-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--rounded-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  transition: transform var(--motion-base) var(--motion-ease);
+}
+a:active .wordmark-mark {
+  transform: rotate(-12deg) scale(0.94);
+}
+@media (max-width: 380px) {
+  /* DESIGN.md mobile nav: logo mark only */
+  .wordmark-text {
+    display: none;
+  }
+}
