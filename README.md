@@ -6,7 +6,7 @@
 
 From that one line, TripMate works out where you're going, when, for how long, with how many people and on what budget. It then builds an itinerary and a cost breakdown, and shows whether the trip fits your budget.
 
-> **Getting it running:** see [SETUP.md](SETUP.md).
+> **Getting it running:** `./run.sh` sets up and starts everything. See [SETUP.md](SETUP.md) for details.
 
 ---
 
@@ -76,6 +76,7 @@ tests/       Automated tests for the backend
 docs/        Architecture notes and API research
 DESIGN.md    The visual design system the website follows
 SETUP.md     How to run it on your own machine
+run.sh       One command to set up and start everything
 ```
 
 ## Further reading
