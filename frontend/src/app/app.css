@@ -1,0 +1,35 @@
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--spacing-lg);
+  z-index: 200;
+  padding: 8px 14px;
+  border-radius: var(--rounded-md);
+  background: var(--color-ink);
+  color: var(--color-on-dark);
+  font-size: 14px;
+  font-weight: 700;
+  transition: top var(--motion-base) var(--motion-ease);
+}
+.skip-link:focus {
+  top: var(--spacing-sm);
+}
+
+main {
+  min-height: calc(100vh - var(--nav-height));
+}
+
+/* Route skeleton helpers */
+.skeleton-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.skeleton-hero-text {
+  width: min(560px, 100%);
+  margin: var(--spacing-md) 0;
+}
+.skeleton-gap {
+  margin-top: var(--spacing-xl);
+}

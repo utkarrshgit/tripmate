@@ -1,0 +1,75 @@
+.legal-head {
+  max-width: 760px;
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+}
+.legal-intro {
+  max-width: 640px;
+}
+.legal-draft {
+  margin-top: var(--spacing-xl);
+}
+.legal-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 720px);
+  gap: var(--spacing-section);
+  margin-top: var(--spacing-section);
+}
+.legal-toc {
+  position: sticky;
+  top: calc(var(--nav-height) + var(--spacing-xl));
+  align-self: start;
+}
+.legal-toc ol {
+  margin-top: var(--spacing-md);
+}
+/* The section being read slides in a 2px ink marker and darkens */
+.legal-toc-link {
+  position: relative;
+  display: block;
+  padding-left: 12px;
+  color: var(--color-mute);
+  transition: color var(--motion-base) var(--motion-ease);
+}
+.legal-toc-link::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  width: 2px;
+  border-radius: var(--rounded-full);
+  background: var(--color-ink);
+  transform: scaleY(0);
+  transition: transform var(--motion-base) var(--motion-ease);
+}
+.legal-toc-link.is-active {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.legal-toc-link.is-active::before {
+  transform: none;
+}
+.legal-section + .legal-section {
+  margin-top: var(--spacing-xxl);
+  padding-top: var(--spacing-xxl);
+  border-top: 1px solid var(--color-hairline);
+}
+.legal-list {
+  padding-left: 20px;
+  list-style: disc;
+}
+.legal-list li + li {
+  margin-top: var(--spacing-sm);
+}
+.legal-related {
+  margin-top: var(--spacing-section);
+}
+@media (max-width: 1024px) {
+  .legal-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--spacing-xxl);
+  }
+  .legal-toc {
+    position: static;
+  }
+}

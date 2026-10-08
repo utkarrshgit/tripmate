@@ -1,0 +1,168 @@
+/* primary-nav */
+.primary-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+}
+.primary-nav.has-rule {
+  border-bottom: 1px solid var(--color-hairline);
+}
+.primary-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  height: var(--nav-height);
+  max-width: calc(var(--container-max) + var(--container-gutter) * 2);
+  margin: 0 auto;
+  padding: 0 var(--container-gutter);
+}
+.nav-left,
+.nav-right {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+.nav-right {
+  margin-left: auto;
+}
+.nav-center {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  min-width: 0;
+}
+.nav-search {
+  width: 100%;
+  max-width: 480px;
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: var(--rounded-md);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+/* Pinterest Red marks the active tab; it draws in from the centre */
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  bottom: 2px;
+  left: 12px;
+  height: 3px;
+  border-radius: var(--rounded-full);
+  background: var(--color-primary);
+  animation: grow-x var(--motion-slow) var(--motion-ease) both;
+}
+
+.nav-mobile {
+  display: none !important;
+}
+
+.nav-search-overlay {
+  padding: 0 var(--container-gutter) var(--spacing-md);
+  background: var(--color-canvas);
+  animation: rise-in var(--motion-base) var(--motion-ease) both;
+  --motion-rise: -6px;
+}
+.nav-search-overlay .nav-search {
+  max-width: none;
+}
+
+.nav-drawer {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: calc(100vh - var(--nav-height));
+  overflow-y: auto;
+  padding: var(--spacing-sm) var(--container-gutter);
+  border-top: 1px solid var(--color-hairline);
+  background: var(--color-canvas);
+  animation: fade-in var(--motion-base) var(--motion-ease) both;
+}
+.nav-drawer li {
+  animation: rise-in var(--motion-slow) var(--motion-ease) both;
+  animation-delay: calc(var(--i, 0) * 30ms);
+}
+.drawer-link {
+  display: block;
+  width: 100%;
+  padding: 16px 0;
+  border: 0;
+  background: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Account popover (hairline-bordered, no shadow) */
+.account-menu {
+  position: relative;
+}
+.account-popover {
+  position: absolute;
+  top: calc(100% + var(--spacing-sm));
+  right: 0;
+  z-index: 60;
+  width: 260px;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-md);
+  background: var(--color-canvas);
+  transform-origin: top right;
+  animation: scale-in var(--motion-base) var(--motion-ease) both;
+}
+.account-popover-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-md);
+}
+.account-popover-head p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: 12px var(--spacing-sm);
+  border: 0;
+  background: none;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Tablet and below: hamburger + centred logo + search glyph + Sign up */
+@media (max-width: 768px) {
+  .primary-nav-inner {
+    gap: var(--spacing-sm);
+  }
+  .nav-desktop,
+  .nav-center {
+    display: none !important;
+  }
+  .nav-mobile {
+    display: inline-flex !important;
+  }
+  .nav-left {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}

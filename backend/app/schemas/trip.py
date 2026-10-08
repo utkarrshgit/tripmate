@@ -15,3 +15,11 @@ class TripResponse(BaseModel):
     issues: list[str]
     completed_agents: list[str]
     final_response: str
+
+    interests: list[str] = []
+    destination_info: dict = {}
+    transport_options: list[dict] = []
+    hotel_options: list[dict] = []
+    activities: list[dict] = []
+    food_options: list[dict] = []
+    cost_breakdown: dict[str, float] = {}

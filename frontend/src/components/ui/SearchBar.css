@@ -1,0 +1,45 @@
+/* search-bar / search-bar-focused */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  height: 48px;
+  padding: 0 4px 0 15px;
+  border: 1px solid transparent;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  transition:
+    background-color var(--motion-base) var(--motion-ease),
+    border-color var(--motion-base) var(--motion-ease);
+}
+.search-bar:focus-within {
+  background: var(--color-canvas);
+  border-color: var(--color-ash);
+}
+.search-bar-glyph {
+  flex: none;
+  color: var(--color-mute);
+}
+.search-bar input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 11px 0;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+}
+.search-bar input::placeholder {
+  color: var(--color-ash);
+}
+.search-bar input:focus-visible {
+  box-shadow: none;
+}
+/* The submit arrow nudges forward once the bar has content focus */
+.search-bar-submit svg {
+  transition: transform var(--motion-base) var(--motion-ease);
+}
+.search-bar:focus-within .search-bar-submit svg {
+  transform: translateX(2px);
+}

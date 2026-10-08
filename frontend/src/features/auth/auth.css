@@ -1,0 +1,14 @@
+.auth-modal {
+  animation: fade-in var(--motion-base) var(--motion-ease) both;
+}
+.auth-head {
+  margin-bottom: var(--spacing-xl);
+  padding-right: 48px;
+}
+.auth-legal {
+  margin-top: var(--spacing-lg);
+}
+.auth-switch {
+  margin-top: var(--spacing-xl);
+  text-align: center;
+}

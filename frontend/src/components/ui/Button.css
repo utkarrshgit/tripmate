@@ -1,0 +1,102 @@
+/* button-primary / -secondary / -tertiary / -disabled — Default and Pressed only (no hover by policy). */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  height: 40px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--rounded-md);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+.btn-primary:active {
+  background: var(--color-primary-pressed);
+}
+
+.btn-secondary {
+  background: var(--color-secondary-bg);
+  color: var(--color-on-secondary);
+}
+.btn-secondary:active {
+  background: var(--color-secondary-pressed);
+}
+
+.btn-tertiary {
+  background: transparent;
+  color: var(--color-ink);
+}
+.btn-tertiary.is-danger {
+  color: var(--color-error);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  background: var(--color-surface-card);
+  color: var(--color-ash);
+  cursor: not-allowed;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn svg {
+  flex: none;
+}
+
+/* button-icon-circular: 40px, hit target extended to 48px */
+.icon-btn {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  cursor: pointer;
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+.icon-btn::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+.icon-btn:active {
+  transform: scale(0.92);
+}
+.icon-btn.is-bare {
+  background: transparent;
+}
+
+/* Inline text button that reads as a link-inline */
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: inherit;
+  cursor: pointer;
+}

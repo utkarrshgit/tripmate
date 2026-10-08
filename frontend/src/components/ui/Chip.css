@@ -1,0 +1,37 @@
+/* filter-chip / filter-chip-active: the chip inverts on selection */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: var(--rounded-full);
+  background: var(--color-surface-card);
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-base) var(--motion-ease),
+    color var(--motion-base) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+.chip:active {
+  transform: scale(0.96);
+}
+.chip[aria-pressed="true"] {
+  background: var(--color-ink);
+  color: var(--color-on-dark);
+}
+.chip-static {
+  cursor: default;
+}
+
+.chip-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}

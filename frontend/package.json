@@ -8,8 +8,10 @@
     "build": "vite build"
   },
   "dependencies": {
+    "@yogesharc/thinking-orbs": "0.1.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.4.1",

@@ -1,0 +1,12 @@
+/* .section (64px rhythm) is a global layout class in styles/base.css */
+.section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+.section-head p {
+  max-width: 560px;
+}

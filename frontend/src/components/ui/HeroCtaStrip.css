@@ -1,0 +1,22 @@
+.hero-cta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xl);
+  padding: 48px 32px;
+  border-radius: var(--rounded-none);
+  background: var(--color-surface-dark);
+  color: var(--color-on-dark);
+}
+.hero-cta-strip h2 {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -1.2px;
+  color: var(--color-on-dark);
+}
+.hero-cta-strip p {
+  margin-top: var(--spacing-sm);
+  color: var(--color-on-dark-mute);
+}

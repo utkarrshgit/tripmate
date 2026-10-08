@@ -1,0 +1,28 @@
+.masonry {
+  column-count: 4;
+  column-gap: var(--grid-gutter);
+}
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: var(--grid-gutter);
+}
+@media (min-width: 1920px) {
+  .masonry {
+    column-count: 5;
+  }
+}
+@media (max-width: 1024px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+@media (max-width: 768px) {
+  .masonry {
+    column-count: 2;
+  }
+}
+@media (max-width: 480px) {
+  .masonry {
+    column-count: 1;
+  }
+}
