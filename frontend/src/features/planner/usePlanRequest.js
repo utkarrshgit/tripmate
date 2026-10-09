@@ -16,8 +16,11 @@ export function usePlanRequest(onDone) {
     async (query, dates) => {
       setStatus("planning");
       setError("");
+      const startedAt = performance.now();
       try {
-        const plan = await withDemoDelay(planTrip(query, dates), DEMO_DELAYS.planningMs);
+        const response = await withDemoDelay(planTrip(query, dates), DEMO_DELAYS.planningMs);
+        // How long planning took, as the person experienced it ("Planned in 4.5s").
+        const plan = { ...response, planned_in: (performance.now() - startedAt) / 1000 };
         rememberPlan(plan, query);
         setStatus("done");
         onDone(plan, query);

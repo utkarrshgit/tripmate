@@ -47,7 +47,7 @@
   flex-direction: column;
   gap: var(--spacing-sm);
 }
-.planner-tile-orb {
+.planner-tile-icon {
   display: inline-grid;
   place-items: center;
   width: 40px;
@@ -56,9 +56,10 @@
   border-radius: var(--rounded-full);
   background: var(--color-canvas);
   color: var(--color-ink);
-  transition:
-    background-color var(--motion-base) var(--motion-ease),
-    color var(--motion-base) var(--motion-ease);
+}
+.is-visible .planner-tile-icon svg {
+  animation: pop var(--motion-slow) var(--motion-ease) both;
+  animation-delay: calc(min(var(--reveal-index, 0), 8) * 40ms + 120ms);
 }
 .home-estimate-note {
   margin-top: var(--spacing-xl);

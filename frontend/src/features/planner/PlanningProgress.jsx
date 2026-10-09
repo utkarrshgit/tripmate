@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import { Icon, PlannerOrb } from "@/components/ui";
+import { ThoughtLine } from "@/components/ui";
 import { PLANNERS } from "@/data/catalog";
 
 const STEP_MS = 450;
 
 /**
- * Walks through the planners in the order the backend runs them while the
- * request is in flight. The API answers in one response, so the steps are a
- * guide to what's happening rather than live progress; `done` completes them all.
- * Each planner shows its own orb state (reasoning, searching, working…).
+ * The planning screen's status: one ThoughtLine whose trace grows planner by planner,
+ * in the order the backend runs them, then settles into "Planned in 4.5s".
+ * The API answers in one response, so the steps are a guide to what's happening
+ * rather than live progress; `done` settles the line.
  */
 export default function PlanningProgress({ done }) {
   const [step, setStep] = useState(0);
@@ -19,39 +19,19 @@ export default function PlanningProgress({ done }) {
     return () => clearInterval(id);
   }, [done]);
 
-  const current = done ? PLANNERS.length : step;
-  const active = PLANNERS[Math.min(current, PLANNERS.length - 1)];
-
+  const shown = done ? PLANNERS.length : step + 1;
   return (
-    <div className="feature-card feature-card-soft planning" role="status" aria-live="polite">
-      <div className="planning-head">
-        <span className="planning-head-orb" key={done ? "done" : active.id}>
-          {done ? <Icon name="check" size={28} /> : <PlannerOrb planner={active} size={40} />}
-        </span>
-        <div className="stack-xs">
-          <h2 className="t-heading-lg">{done ? "Your plan is ready" : "Planning your trip…"}</h2>
-          <p className="t-body-md c-body planning-caption" key={done ? "done" : active.id}>
-            {done ? "Opening it now." : `${active.label} — ${active.text.toLowerCase()}`}
-          </p>
-        </div>
-      </div>
-      <ol className="planning-steps">
-        {PLANNERS.map((p, i) => {
-          const state = i < current ? "done" : i === current ? "active" : "waiting";
-          return (
-            <li key={p.id} className={`planning-step is-${state}`}>
-              <span className="planning-step-icon" key={state}>
-                {state === "active" ? (
-                  <PlannerOrb planner={p} size={20} />
-                ) : (
-                  <Icon name={state === "done" ? "check" : p.icon} size={18} />
-                )}
-              </span>
-              <span className="t-body-sm-strong">{p.label}</span>
-            </li>
-          );
-        })}
-      </ol>
+    <div className="feature-card feature-card-soft planning">
+      <ThoughtLine
+        working={!done}
+        label="Planning your trip…"
+        doneLabel="Planned in"
+        steps={PLANNERS.slice(0, shown).map((p) => p.doing)}
+        collapseOnSettle={false}
+        fontSize={20}
+        color="var(--color-ink)"
+        glyphColor={done ? "var(--color-ink)" : "var(--color-accent-purple)"}
+      />
     </div>
   );
 }

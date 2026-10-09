@@ -15,17 +15,17 @@ export const INTERESTS = [
 ];
 
 // The supervisor's agents, in the order it runs them (backend/app/agents/supervisor.py).
-// `orb` is the Thinking Orbs state that shows what each one is doing (see components/ui/AgentOrb.jsx).
+// `doing` is the live step shown while planning; `did` is the settled step on a finished plan.
 export const PLANNERS = [
-  { id: "planner", icon: "compass", label: "Request reader", text: "Reads your request", orb: { state: "reasoning" } },
-  { id: "destination", icon: "pin", label: "Destination", text: "Learns about the place", orb: { state: "searching" } },
-  { id: "transport", icon: "train", label: "Transport", text: "Prices the journey", orb: { state: "searching", variant: "lighthouse" } },
-  { id: "hotel", icon: "bed", label: "Stays", text: "Finds rooms", orb: { state: "searching" } },
-  { id: "activity", icon: "ticket", label: "Activities", text: "Picks things to do", orb: { state: "searching", variant: "lighthouse" } },
-  { id: "food", icon: "utensils", label: "Food", text: "Budgets meals", orb: { state: "searching" } },
-  { id: "budget", icon: "wallet", label: "Budget", text: "Adds up the costs", orb: { state: "working" } },
-  { id: "itinerary", icon: "calendar", label: "Itinerary", text: "Lays out each day", orb: { state: "working", variant: "gyro" } },
-  { id: "critic", icon: "shield", label: "Final review", text: "Checks the plan for problems", orb: { state: "reasoning", variant: "twins" } },
+  { id: "planner", icon: "compass", label: "Request reader", text: "Reads your request", doing: "Reading your request", did: "Read your request" },
+  { id: "destination", icon: "pin", label: "Destination", text: "Learns about the place", doing: "Learning about the place", did: "Learned about the place" },
+  { id: "transport", icon: "train", label: "Transport", text: "Prices the journey", doing: "Pricing the journey", did: "Priced the journey" },
+  { id: "hotel", icon: "bed", label: "Stays", text: "Finds rooms", doing: "Finding rooms", did: "Found rooms" },
+  { id: "activity", icon: "ticket", label: "Activities", text: "Picks things to do", doing: "Picking things to do", did: "Picked things to do" },
+  { id: "food", icon: "utensils", label: "Food", text: "Budgets meals", doing: "Budgeting meals", did: "Budgeted meals" },
+  { id: "budget", icon: "wallet", label: "Budget", text: "Adds up the costs", doing: "Adding up the costs", did: "Added up the costs" },
+  { id: "itinerary", icon: "calendar", label: "Itinerary", text: "Lays out each day", doing: "Laying out each day", did: "Laid out each day" },
+  { id: "critic", icon: "shield", label: "Final review", text: "Checks the plan for problems", doing: "Checking the plan for problems", did: "Checked the plan for problems" },
 ];
 
 export const plannerById = (id) => PLANNERS.find((p) => p.id === id);

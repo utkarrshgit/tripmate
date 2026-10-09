@@ -37,20 +37,10 @@
   }
 }
 
-/* Loading */
-.pricing-loading {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-lg);
-}
-.pricing-loading-orb {
-  display: inline-grid;
-  place-items: center;
-  width: 60px;
-  height: 60px;
-  border-radius: var(--rounded-full);
-  background: var(--color-surface-card);
+/* Loading: the working line above a skeleton of the results */
+.pricing-loading-wrap {
+  display: grid;
+  gap: var(--spacing-xl);
 }
 
 .pricing-results {

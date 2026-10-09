@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { checkHealth } from "@/api/client";
-import { AgentOrb, Button, SystemPage } from "@/components/ui";
+import { Button, SystemPage } from "@/components/ui";
 import { DEMO_DELAYS, withDemoDelay } from "@/config/demo";
 
 /** Shown when the planning API can't be reached. onRecovered runs once /health answers again. */
@@ -19,15 +19,7 @@ export default function UnavailablePanel({ onRecovered }) {
 
   return (
     <SystemPage
-      // Waiting for the service; switches to "retrying" while a check is in flight.
-      media={
-        <AgentOrb
-          key={checking ? "retrying" : "waiting"}
-          state={checking ? "retrying" : "waiting"}
-          size={32}
-          label={checking ? "Checking the planner" : "Waiting for the planner"}
-        />
-      }
+      icon="compass"
       title="We can't reach the trip planner"
       actions={
         <>

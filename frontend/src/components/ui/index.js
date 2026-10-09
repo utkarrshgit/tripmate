@@ -1,5 +1,4 @@
 // Design-system primitives. Import from "@/components/ui".
-export { default as AgentOrb, PlannerOrb } from "./AgentOrb";
 export { default as Button, IconButton } from "./Button";
 export { default as Chip, ChipStrip } from "./Chip";
 export { Avatar, Notice, StatusPill } from "./Feedback";
@@ -15,4 +14,5 @@ export { default as Section } from "./Section";
 export { Skeleton, SkeletonScreen, SkeletonText } from "./Skeleton";
 export { default as SystemPage } from "./SystemPage";
 export { default as TextField } from "./TextField";
+export { default as ThoughtLine } from "./ThoughtLine";
 export { Tile, TileGrid } from "./Tile";
