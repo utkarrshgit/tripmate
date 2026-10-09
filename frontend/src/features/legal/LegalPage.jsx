@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Notice } from "@/components/ui";
-import { cx } from "@/utils/cx";
+import { BranchedMenu, Notice } from "@/components/ui";
 import "./legal.css";
 
-/** Tracks which section is currently being read, for the contents list. */
+/** Tracks which section is being read. Returns [active, setActive] so a click can move it straight away. */
 function useActiveSection(ids) {
   const [active, setActive] = useState(ids[0]);
   useEffect(() => {
@@ -22,7 +21,31 @@ function useActiveSection(ids) {
     });
     return () => observer.disconnect();
   }, [ids]);
-  return active;
+  return [active, setActive];
+}
+
+/**
+ * Contents menu items: consecutive sections that share a `group` become one folding
+ * branch; the rest are single rows. Numbers match the section headings.
+ */
+function menuItems(sections) {
+  const items = [];
+  sections.forEach((s, i) => {
+    const row = { value: s.id, label: `${i + 1}. ${s.title}` };
+    const last = items.at(-1);
+    if (!s.group) items.push(row);
+    else if (last?.children && last.label === s.group) last.children.push(row);
+    else items.push({ label: s.group, children: [row] });
+  });
+  return items;
+}
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  window.history.replaceState(window.history.state, "", `#${id}`);
 }
 
 /**
@@ -31,7 +54,23 @@ function useActiveSection(ids) {
  */
 export default function LegalPage({ doc }) {
   const ids = useMemo(() => doc.sections.map((s) => s.id), [doc]);
-  const active = useActiveSection(ids);
+  const [active, setActive] = useActiveSection(ids);
+  const items = useMemo(() => menuItems(doc.sections), [doc]);
+  // Every group starts open, so the whole document and its branches show at a glance.
+  const allGroups = useMemo(() => items.flatMap((item, i) => (item.children ? [i] : [])), [items]);
+  const tocRef = useRef(null);
+
+  // When the menu is taller than the screen, keep the section being read in view inside it
+  // (scrolling only the menu, never the page).
+  useEffect(() => {
+    const toc = tocRef.current;
+    const row = toc?.querySelector(`[data-active]`);
+    if (!toc || !row || toc.scrollHeight <= toc.clientHeight) return;
+    const top = row.getBoundingClientRect().top - toc.getBoundingClientRect().top + toc.scrollTop;
+    if (top < toc.scrollTop || top + row.offsetHeight > toc.scrollTop + toc.clientHeight) {
+      toc.scrollTo({ top: top - toc.clientHeight / 2, behavior: "smooth" });
+    }
+  }, [active]);
 
   return (
     <div className="container section legal-page">
@@ -49,22 +88,24 @@ export default function LegalPage({ doc }) {
       </header>
 
       <div className="legal-layout">
-        <nav className="legal-toc no-print" aria-label="On this page">
+        <div ref={tocRef} className="legal-toc no-print">
           <p className="t-body-sm-strong c-ink">On this page</p>
-          <ol className="stack-xs">
-            {doc.sections.map((s, i) => (
-              <li key={s.id}>
-                <a
-                  href={`#${s.id}`}
-                  className={cx("legal-toc-link t-body-sm", active === s.id && "is-active")}
-                  aria-current={active === s.id ? "location" : undefined}
-                >
-                  {i + 1}. {s.title}
-                </a>
-              </li>
-            ))}
-          </ol>
-        </nav>
+          <BranchedMenu
+            key={doc.title}
+            label="On this page"
+            items={items}
+            active={active}
+            defaultOpen={allGroups}
+            onSelect={(id) => {
+              setActive(id); // highlight now; the observer keeps it in step as the page scrolls
+              scrollToSection(id);
+            }}
+            width={280}
+            rowHeight={34}
+            indent={36}
+            className="legal-menu"
+          />
+        </div>
 
         <div className="legal-body">
           {doc.sections.map((s, i) => (

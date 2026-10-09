@@ -2,7 +2,8 @@ import { List, P } from "../blocks";
 
 /*
  * Privacy Policy content. Text in [square brackets] is a placeholder to replace
- * before launch. Each section needs a unique `id` (used as its anchor).
+ * before launch. Each section needs a unique `id` (used as its anchor). Sections sharing a
+ * `group` are listed together under that heading in the contents menu; the rest stand alone.
  */
 export default {
   title: "Privacy Policy",
@@ -22,6 +23,7 @@ export default {
     },
     {
       id: "what-we-collect",
+      group: "Your information",
       title: "What we collect",
       body: (
         <>
@@ -40,6 +42,7 @@ export default {
     },
     {
       id: "how-we-use",
+      group: "Your information",
       title: "How we use your information",
       body: (
         <List
@@ -54,6 +57,7 @@ export default {
     },
     {
       id: "automated-planning",
+      group: "Your information",
       title: "Automated planning and AI",
       body: (
         <>
@@ -68,6 +72,7 @@ export default {
     },
     {
       id: "sharing",
+      group: "Your information",
       title: "Who we share it with",
       body: (
         <>
@@ -85,6 +90,7 @@ export default {
     },
     {
       id: "storage",
+      group: "Your information",
       title: "How long we keep it",
       body: (
         <P>
@@ -96,6 +102,7 @@ export default {
     },
     {
       id: "cookies",
+      group: "Your information",
       title: "Cookies and local storage",
       body: (
         <P>
@@ -106,6 +113,7 @@ export default {
     },
     {
       id: "your-rights",
+      group: "Your rights and safety",
       title: "Your rights",
       body: (
         <>
@@ -125,6 +133,7 @@ export default {
     },
     {
       id: "children",
+      group: "Your rights and safety",
       title: "Children",
       body: (
         <P>
@@ -135,6 +144,7 @@ export default {
     },
     {
       id: "security",
+      group: "Your rights and safety",
       title: "Security",
       body: (
         <P>

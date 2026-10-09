@@ -2,7 +2,8 @@ import { List, P } from "../blocks";
 
 /*
  * Terms and Conditions content. Text in [square brackets] is a placeholder to replace
- * before launch. Each section needs a unique `id` (used as its anchor).
+ * before launch. Each section needs a unique `id` (used as its anchor). Sections sharing a
+ * `group` are listed together under that heading in the contents menu; the rest stand alone.
  */
 export default {
   title: "Terms and Conditions",
@@ -12,6 +13,7 @@ export default {
   sections: [
     {
       id: "the-service",
+      group: "The service",
       title: "What TripMate is",
       body: (
         <>
@@ -27,6 +29,7 @@ export default {
     },
     {
       id: "estimates",
+      group: "The service",
       title: "Prices are estimates",
       body: (
         <P>
@@ -37,6 +40,7 @@ export default {
     },
     {
       id: "automated-content",
+      group: "The service",
       title: "Automatically generated plans",
       body: (
         <P>
@@ -48,6 +52,7 @@ export default {
     },
     {
       id: "your-account",
+      group: "Using TripMate",
       title: "Your account",
       body: (
         <List
@@ -61,6 +66,7 @@ export default {
     },
     {
       id: "acceptable-use",
+      group: "Using TripMate",
       title: "Acceptable use",
       body: (
         <>
@@ -78,6 +84,7 @@ export default {
     },
     {
       id: "ip",
+      group: "Using TripMate",
       title: "Intellectual property",
       body: (
         <P>
@@ -88,6 +95,7 @@ export default {
     },
     {
       id: "liability",
+      group: "Legal terms",
       title: "Disclaimers and liability",
       body: (
         <>
@@ -101,6 +109,7 @@ export default {
     },
     {
       id: "suspension",
+      group: "Legal terms",
       title: "Suspension and termination",
       body: (
         <P>
@@ -111,6 +120,7 @@ export default {
     },
     {
       id: "law",
+      group: "Legal terms",
       title: "Governing law and disputes",
       body: (
         <P>
@@ -121,6 +131,7 @@ export default {
     },
     {
       id: "changes",
+      group: "Legal terms",
       title: "Changes to these terms",
       body: (
         <P>

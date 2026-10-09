@@ -10,44 +10,21 @@
 }
 .legal-layout {
   display: grid;
-  grid-template-columns: 240px minmax(0, 720px);
+  grid-template-columns: 280px minmax(0, 720px);
   gap: var(--spacing-section);
   margin-top: var(--spacing-section);
 }
+/* Beside the text, it follows you down the page; a long menu scrolls on its own */
 .legal-toc {
   position: sticky;
   top: calc(var(--nav-height) + var(--spacing-xl));
   align-self: start;
+  max-height: calc(100vh - var(--nav-height) - 2 * var(--spacing-xl));
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
-.legal-toc ol {
+.legal-menu {
   margin-top: var(--spacing-md);
-}
-/* The section being read slides in a 2px ink marker and darkens */
-.legal-toc-link {
-  position: relative;
-  display: block;
-  padding-left: 12px;
-  color: var(--color-mute);
-  transition: color var(--motion-base) var(--motion-ease);
-}
-.legal-toc-link::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  bottom: 2px;
-  left: 0;
-  width: 2px;
-  border-radius: var(--rounded-full);
-  background: var(--color-ink);
-  transform: scaleY(0);
-  transition: transform var(--motion-base) var(--motion-ease);
-}
-.legal-toc-link.is-active {
-  color: var(--color-ink);
-  font-weight: 600;
-}
-.legal-toc-link.is-active::before {
-  transform: none;
 }
 .legal-section + .legal-section {
   margin-top: var(--spacing-xxl);
@@ -66,10 +43,20 @@
 }
 @media (max-width: 1024px) {
   .legal-layout {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 280px minmax(0, 1fr);
     gap: var(--spacing-xxl);
+  }
+}
+/* Phones: the menu sits above the text, in a card so it reads as the page's contents */
+@media (max-width: 767px) {
+  .legal-layout {
+    grid-template-columns: minmax(0, 1fr);
   }
   .legal-toc {
     position: static;
+    max-height: none;
+    padding: var(--spacing-lg);
+    border-radius: var(--rounded-md);
+    background: var(--color-surface-card);
   }
 }

@@ -1,4 +1,5 @@
 // Design-system primitives. Import from "@/components/ui".
+export { default as BranchedMenu } from "./BranchedMenu";
 export { default as Button, IconButton } from "./Button";
 export { default as Chip, ChipStrip } from "./Chip";
 export { Avatar, Notice, StatusPill } from "./Feedback";
