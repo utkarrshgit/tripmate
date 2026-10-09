@@ -3,17 +3,18 @@ import { Route, Routes, matchRoutes, useLocation } from "react-router-dom";
 import Footer from "@/components/layout/Footer";
 import Nav from "@/components/layout/Nav";
 import { AuthModal } from "@/features/auth";
-import { ROUTES, documentTitle } from "./routes";
+import { ROUTES } from "./routes";
+import { useHead } from "./useHead";
 import "./app.css";
 
-/** Sets the document title and handles scroll position on navigation. */
+/** Sets the page's head tags and handles scroll position on navigation. */
 function useRouteEffects() {
   const location = useLocation();
   const { pathname, hash } = location;
+  const [match] = matchRoutes(ROUTES, location) ?? [];
+  useHead(match?.route.path ?? "*");
 
   useEffect(() => {
-    const [match] = matchRoutes(ROUTES, location) ?? [];
-    document.title = match ? documentTitle(match.route) : "TripMate";
     if (hash) {
       // Wait a frame so a lazily loaded page has rendered its anchor.
       requestAnimationFrame(() => document.getElementById(hash.slice(1))?.scrollIntoView({ behavior: "smooth" }));

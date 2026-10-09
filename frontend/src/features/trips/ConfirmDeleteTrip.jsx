@@ -1,4 +1,5 @@
 import { Button, Modal } from "@/components/ui";
+import { tripPhrase } from "./tripMeta";
 
 export default function ConfirmDeleteTrip({ trip, onCancel, onConfirm }) {
   return (
@@ -6,8 +7,7 @@ export default function ConfirmDeleteTrip({ trip, onCancel, onConfirm }) {
       {({ close }) => (
         <div className="stack-xl modal-body">
           <p className="t-body-md c-body">
-            Your saved plan for <strong className="c-ink">{trip.plan.destination}</strong> will be removed. This can't be
-            undone.
+            This deletes {tripPhrase(trip.plan)} from your saved trips. You can't undo this.
           </p>
           <div className="row modal-actions">
             <Button onClick={close}>Cancel</Button>

@@ -27,7 +27,7 @@ export default function PriceComparison({ estimate, exact, parts }) {
           {tone === "neutral" ? "Same as estimated" : `${rupees(Math.abs(diff))} ${diff < 0 ? "less" : "more"} than estimated`}
         </StatusPill>
         {stillEstimated.length > 0 && (
-          <p className="t-caption-md c-mute">{stillEstimated.join(" and ")} are still estimates</p>
+          <p className="t-caption-md c-mute">{new Intl.ListFormat("en", { type: "conjunction" }).format(stillEstimated)} are still estimates</p>
         )}
       </div>
     </div>

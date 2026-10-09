@@ -1,0 +1,105 @@
+/*
+ * Calendar — built from DESIGN.md tokens: round day buttons (rounded.full), ink for
+ * the selected days, a surface-card band for the days between, no hover states.
+ */
+.calendar {
+  display: grid;
+  gap: var(--spacing-md);
+  min-width: 0;
+}
+
+.calendar-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-ink);
+  text-align: center;
+}
+
+.calendar-grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.calendar-grid th {
+  padding-bottom: var(--spacing-xs);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-mute);
+  text-align: center;
+}
+
+.calendar-cell {
+  padding: 2px 0;
+  text-align: center;
+}
+
+/* The band between start and end: square across the row, starting and stopping
+   at the centre of the start and return days so it tucks behind their circles */
+.calendar-cell {
+  position: relative;
+}
+.calendar-cell.is-in-range::before,
+.calendar-cell.is-range-start::before,
+.calendar-cell.is-range-end::before {
+  content: "";
+  position: absolute;
+  inset: 2px 0;
+  background: var(--color-surface-card);
+}
+.calendar-cell.is-range-start::before {
+  left: 50%;
+}
+.calendar-cell.is-range-end::before {
+  right: 50%;
+}
+
+.calendar-day {
+  position: relative;
+  z-index: 1;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: var(--rounded-full);
+  background: transparent;
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease),
+    transform var(--motion-fast) var(--motion-ease);
+}
+.calendar-day:active:not([aria-disabled]) {
+  transform: scale(0.92);
+}
+.calendar-day.is-today {
+  box-shadow: inset 0 0 0 1px var(--color-ash);
+}
+.calendar-day.is-selected {
+  background: var(--color-ink);
+  color: var(--color-on-dark);
+  font-weight: 700;
+}
+.calendar-day[aria-disabled] {
+  color: var(--color-stone);
+  cursor: not-allowed;
+}
+/* Keyboard focus: the global double ring, drawn inside the round shape */
+.calendar-day:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-focus-inner), 0 0 0 4px var(--color-focus-outer);
+}
+
+@media (max-width: 380px) {
+  .calendar-day {
+    width: 36px;
+    height: 36px;
+  }
+}

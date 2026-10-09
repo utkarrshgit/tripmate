@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { AgentOrb, Button, Chip, ChipStrip, Icon, Notice, Skeleton, SkeletonScreen } from "@/components/ui";
+import { Button, Chip, ChipStrip, Icon, Notice, Skeleton, SkeletonScreen, ThoughtLine } from "@/components/ui";
 import { DateRangeField, usableDates, validateTripDates } from "@/features/planner";
+import { tripName } from "@/features/trips";
 import { recallOrigin, rememberOrigin } from "@/state/session";
 import { formatDateRange, plural, rupees } from "@/utils/format";
 import OriginForm from "./OriginForm";
@@ -10,23 +11,33 @@ import { cheapestIndex, exactTotal } from "./pricingMath";
 import QuoteGroup from "./QuoteGroup";
 import { usePriceRequest } from "./usePriceRequest";
 
-function LoadingQuotes() {
+const PRICING_STEPS_MS = 700;
+
+/** While prices load: a working line whose trace grows, over a skeleton of the results. */
+function LoadingQuotes({ origin }) {
+  const steps = [origin ? `Finding fares from ${origin}` : "Skipping fares — no starting city", "Checking rooms for your dates", "Comparing with your estimate"];
+  const [shown, setShown] = useState(1);
+  useEffect(() => {
+    const id = setInterval(() => setShown((n) => Math.min(n + 1, steps.length)), PRICING_STEPS_MS);
+    return () => clearInterval(id);
+  }, [steps.length]);
+
   return (
-    <SkeletonScreen label="Checking exact prices">
-      <div className="pricing-loading">
-        <span className="pricing-loading-orb">
-          <AgentOrb state="searching" variant="lighthouse" size={36} />
-        </span>
-        <div className="stack-xs">
-          <p className="t-heading-md">Checking fares and rooms…</p>
-          <p className="t-body-sm c-mute">Comparing options for your dates</p>
+    <div className="pricing-loading-wrap">
+      <ThoughtLine
+        label="Checking fares and rooms…"
+        steps={steps.slice(0, shown)}
+        showTimer={false}
+        color="var(--color-ink)"
+        glyphColor="var(--color-accent-purple)"
+      />
+      <SkeletonScreen label="Loading exact prices">
+        <div className="quote-groups">
+          <Skeleton height={220} />
+          <Skeleton height={220} />
         </div>
-      </div>
-      <div className="quote-groups">
-        <Skeleton height={220} />
-        <Skeleton height={220} />
-      </div>
-    </SkeletonScreen>
+      </SkeletonScreen>
+    </div>
   );
 }
 
@@ -81,7 +92,7 @@ export default function ExactPricesView({ plan, query, saved = null, backTo, ren
       </Button>
 
       <header className="stack-md page-intro">
-        <h1 className="t-display-lg">Exact prices · {plan.destination}</h1>
+        <h1 className="t-display-lg">Exact prices · {tripName(plan)}</h1>
         <ChipStrip>
           {!needsDates && (
             <Chip>
@@ -97,18 +108,26 @@ export default function ExactPricesView({ plan, query, saved = null, backTo, ren
         </ChipStrip>
       </header>
 
+      {!plan.destination ? (
+        <Notice icon="pin" title="Add a destination to check exact prices">
+          <p className="t-body-sm">
+            Select <strong>Back to trip</strong>, then <strong>Edit request</strong> and add a place, like “in Goa”.
+          </p>
+        </Notice>
+      ) : (
       <div className="pricing-form">
         {needsDates && (
           <DateRangeField dates={dates} source="picker" error={datesTouched ? datesError : null} onChange={setDates} />
         )}
         <OriginForm initialOrigin={origin} hasResult={Boolean(response)} loading={status === "loading"} onSubmit={check} />
       </div>
+      )}
 
-      {status === "loading" && <LoadingQuotes />}
+      {status === "loading" && <LoadingQuotes origin={origin} />}
 
       {status === "error" && (
         <Notice tone="error" icon="alert" title={error} className="swap-in">
-          <p className="t-body-sm">Your trip is unchanged. Try again in a moment.</p>
+          <p className="t-body-sm">Your trip hasn't changed. Wait a moment, then try again.</p>
         </Notice>
       )}
 
@@ -123,14 +142,19 @@ export default function ExactPricesView({ plan, query, saved = null, backTo, ren
           {response.is_sample && (
             <Notice icon="info" title="Sample prices">
               <p className="t-body-sm">
-                Real fares aren't connected yet, so these are generated for testing. Don't book from them.
+                These are made-up prices for testing, because real fares aren't connected yet. Don't use them to book.
               </p>
             </Notice>
           )}
 
           <PriceComparison estimate={plan.total_cost} exact={totals.total} parts={totals.parts} />
 
-          {response.message && <p className="t-body-sm c-mute inline-icon"><Icon name="info" size={16} /> {response.message}</p>}
+          {/* Skip the API's origin hint when the empty transport list already asks for it */}
+          {response.message && response.transport.length > 0 && (
+            <p className="t-body-sm c-mute inline-icon">
+              <Icon name="info" size={16} /> {response.message}
+            </p>
+          )}
 
           <div className="quote-groups">
             <QuoteGroup
@@ -139,7 +163,7 @@ export default function ExactPricesView({ plan, query, saved = null, backTo, ren
               quotes={response.transport}
               selected={selection.transport}
               onSelect={(i) => setSelection((s) => ({ ...s, transport: i }))}
-              empty="Add where you're travelling from to see fares."
+              empty="Add your starting city to view fares."
             />
             <QuoteGroup
               icon="bed"

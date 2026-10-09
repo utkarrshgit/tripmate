@@ -1,0 +1,518 @@
+{
+  "andaman": {
+    "width": 736,
+    "height": 1104,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/andaman-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/andaman-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/andaman-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/andaman-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/andaman-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/andaman-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/andaman-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/andaman-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/andaman-736.jpg"
+  },
+  "coorg": {
+    "width": 736,
+    "height": 897,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/coorg-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/coorg-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/coorg-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/coorg-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/coorg-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/coorg-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/coorg-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/coorg-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/coorg-736.jpg"
+  },
+  "darjeeling": {
+    "width": 735,
+    "height": 917,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/darjeeling-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/darjeeling-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/darjeeling-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/darjeeling-735.avif",
+          "width": 735
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/darjeeling-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/darjeeling-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/darjeeling-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/darjeeling-735.webp",
+          "width": 735
+        }
+      ]
+    },
+    "fallback": "/images/destinations/darjeeling-735.jpg"
+  },
+  "goa": {
+    "width": 736,
+    "height": 1104,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/goa-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/goa-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/goa-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/goa-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/goa-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/goa-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/goa-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/goa-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/goa-736.jpg"
+  },
+  "hampi": {
+    "width": 736,
+    "height": 1307,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/hampi-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/hampi-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/hampi-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/hampi-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/hampi-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/hampi-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/hampi-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/hampi-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/hampi-736.jpg"
+  },
+  "jaipur": {
+    "width": 736,
+    "height": 1104,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/jaipur-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/jaipur-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/jaipur-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/jaipur-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/jaipur-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/jaipur-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/jaipur-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/jaipur-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/jaipur-736.jpg"
+  },
+  "kerala": {
+    "width": 736,
+    "height": 981,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/kerala-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/kerala-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/kerala-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/kerala-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/kerala-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/kerala-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/kerala-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/kerala-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/kerala-736.jpg"
+  },
+  "ladakh": {
+    "width": 735,
+    "height": 919,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/ladakh-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/ladakh-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/ladakh-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/ladakh-735.avif",
+          "width": 735
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/ladakh-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/ladakh-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/ladakh-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/ladakh-735.webp",
+          "width": 735
+        }
+      ]
+    },
+    "fallback": "/images/destinations/ladakh-735.jpg"
+  },
+  "manali": {
+    "width": 736,
+    "height": 1308,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/manali-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/manali-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/manali-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/manali-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/manali-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/manali-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/manali-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/manali-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/manali-736.jpg"
+  },
+  "rishikesh": {
+    "width": 736,
+    "height": 981,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/rishikesh-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/rishikesh-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/rishikesh-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/rishikesh-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/rishikesh-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/rishikesh-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/rishikesh-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/rishikesh-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/rishikesh-736.jpg"
+  },
+  "udaipur": {
+    "width": 736,
+    "height": 920,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/udaipur-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/udaipur-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/udaipur-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/udaipur-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/udaipur-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/udaipur-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/udaipur-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/udaipur-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/udaipur-736.jpg"
+  },
+  "varanasi": {
+    "width": 736,
+    "height": 1318,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/destinations/varanasi-360.avif",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/varanasi-540.avif",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/varanasi-640.avif",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/varanasi-736.avif",
+          "width": 736
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/destinations/varanasi-360.webp",
+          "width": 360
+        },
+        {
+          "src": "/images/destinations/varanasi-540.webp",
+          "width": 540
+        },
+        {
+          "src": "/images/destinations/varanasi-640.webp",
+          "width": 640
+        },
+        {
+          "src": "/images/destinations/varanasi-736.webp",
+          "width": 736
+        }
+      ]
+    },
+    "fallback": "/images/destinations/varanasi-736.jpg"
+  }
+}

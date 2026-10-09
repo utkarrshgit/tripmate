@@ -6,10 +6,10 @@ import { destinationImages } from "@/data/images";
 
 // Pins scattered around the "404" card. Each floats on its own slow rhythm.
 const COLLAGE = [
-  { key: "ladakh", pill: "Off the map", ratio: "3 / 4", area: "a" },
-  { key: "goa", pill: "Wrong turn", ratio: "1 / 1", area: "b" },
-  { key: "hampi", pill: "Detour", ratio: "4 / 5", area: "d" },
-  { key: "kerala", pill: "Uncharted", ratio: "3 / 4", area: "e" },
+  { key: "ladakh", pill: "Ladakh", ratio: "3 / 4", area: "a" },
+  { key: "goa", pill: "Goa", ratio: "1 / 1", area: "b" },
+  { key: "hampi", pill: "Hampi", ratio: "4 / 5", area: "d" },
+  { key: "kerala", pill: "Kerala", ratio: "3 / 4", area: "e" },
 ];
 
 const JUMP_TO = DESTINATIONS.slice(0, 4);
@@ -23,10 +23,9 @@ export default function NotFoundView() {
       <div className="not-found-copy stack-xl">
         <div className="stack-md">
           <StatusPill icon="compass">Error 404</StatusPill>
-          <h1 className="t-display-xl">This page took a wrong turn</h1>
+          <h1 className="t-display-xl">We can't find this page</h1>
           <p className="t-body-md c-body not-found-body">
-            The page you're looking for doesn't exist, or it has moved. Every good trip has a detour or two — let's get you
-            back on the road.
+            It may have moved, or the link may be out of date. Plan a trip from here, or go back to the home page.
           </p>
         </div>
 
@@ -36,7 +35,7 @@ export default function NotFoundView() {
         </div>
 
         <div className="stack-sm">
-          <p className="t-body-sm-strong c-ink">Or jump straight to</p>
+          <p className="t-body-sm-strong c-ink">Or start with a destination</p>
           <ChipStrip>
             {JUMP_TO.map((d) => (
               <Chip key={d.key} onClick={() => planFrom(d.prompt)}>
@@ -48,7 +47,7 @@ export default function NotFoundView() {
 
         <div className="row">
           <Button as={Link} to="/" icon="arrowLeft">
-            Back to home
+            Go home
           </Button>
           <Button as={Link} to="/#destinations" variant="tertiary">
             Browse destinations
@@ -59,7 +58,7 @@ export default function NotFoundView() {
       <div className="not-found-collage" aria-hidden="true">
         {COLLAGE.map((p, i) => (
           <div key={p.key} className="not-found-pin" style={{ gridArea: p.area, "--i": i }}>
-            <PinCard src={destinationImages[p.key]} ratio={p.ratio} bottomLeft={<OverlayPill>{p.pill}</OverlayPill>} />
+            <PinCard src={destinationImages[p.key]} ratio={p.ratio} sizes="200px" bottomLeft={<OverlayPill>{p.pill}</OverlayPill>} />
           </div>
         ))}
         <div className="not-found-pin not-found-center" style={{ gridArea: "c", "--i": 4 }}>
@@ -68,7 +67,7 @@ export default function NotFoundView() {
               <Icon name="compass" size={28} />
             </span>
             <span className="not-found-code">404</span>
-            <span className="pin-overlay-pill">You are here</span>
+            <span className="pin-overlay-pill">Page not found</span>
           </div>
         </div>
       </div>

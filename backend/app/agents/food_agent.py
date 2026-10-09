@@ -13,7 +13,7 @@ class FoodAgent(BaseAgent):
 
         state["food_options"] = [
             {
-                "category": "local budget meals",
+                "category": "local meals",
                 "estimated_daily_per_person": daily_per_person,
                 "estimated_trip_total": total,
             }

@@ -35,16 +35,16 @@ export default function DataControls() {
     <>
       <div className="stack-sm account-section-head">
         <p className="t-body-md c-body">
-          Download a copy of everything TripMate holds about you, or delete your account. See our{" "}
+          Download a copy of everything TripMate holds about you, or delete your account. Read our{" "}
           <Link to="/privacy" className="link-inline">
             Privacy Policy
           </Link>{" "}
-          for how your data is used.
+          to learn how we use your data.
         </p>
       </div>
       <ul className="divided account-rows">
         <DataRow
-          title="Download my data"
+          title="Download your data"
           body="Your profile and saved trips as a JSON file."
           action={
             <Button icon="download" onClick={() => downloadJson(exportData(), "tripmate-data.json")}>
@@ -70,7 +70,7 @@ export default function DataControls() {
         <DataRow
           danger
           title="Delete account"
-          body="Permanently removes your account and every saved trip."
+          body="Permanently deletes your account and every saved trip."
           action={
             <Button variant="tertiary" icon="trash" className="is-danger" onClick={() => setConfirming(true)}>
               Delete account
@@ -84,7 +84,7 @@ export default function DataControls() {
           {({ close }) => (
             <div className="stack-xl modal-body">
               <p className="t-body-md c-error">
-                This permanently deletes your account and {plural(trips.length, "saved trip")}. It can't be undone.
+                This permanently deletes your account and {plural(trips.length, "saved trip")}. You cannot undo this.
               </p>
               <div className="row modal-actions">
                 <Button onClick={close}>Cancel</Button>

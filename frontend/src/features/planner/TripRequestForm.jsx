@@ -40,7 +40,7 @@ export default function TripRequestForm({ query, onQueryChange, tripDates, onSub
     >
       {askForDates && (
         <Notice icon="calendar" className="swap-in">
-          <p className="t-body-sm">Pick your dates to plan this trip.</p>
+          <p className="t-body-sm">Select your travel dates to plan this trip.</p>
         </Notice>
       )}
 
@@ -59,9 +59,9 @@ export default function TripRequestForm({ query, onQueryChange, tripDates, onSub
             submit();
           }
         }}
-        placeholder="5 days in Manali, 12–16 Dec, under ₹30000 for 3 people, nature and adventure"
-        error={touched.query && tooShort ? `Tell us a little more — at least ${MIN_REQUEST_LENGTH} characters.` : null}
-        help="Press Enter to plan. Shift + Enter adds a new line."
+        placeholder="5 days in Manali, 12–16 Dec, under ₹30,000 for 3 people, nature and adventure"
+        error={touched.query && tooShort ? `Describe your trip in at least ${MIN_REQUEST_LENGTH} characters.` : null}
+        help="Press Enter to plan. Press Shift+Enter for a new line."
       />
 
       <DateRangeField
@@ -77,27 +77,14 @@ export default function TripRequestForm({ query, onQueryChange, tripDates, onSub
 
       {error && (
         <Notice tone="error" icon="alert" title={error} role="alert" className="swap-in">
-          <p className="t-body-sm">Your request is still here. Try again in a moment.</p>
+          <p className="t-body-sm">Your request is still here. Wait a moment, then try again.</p>
         </Notice>
       )}
 
       <div className="row">
         <Button type="submit" variant="primary">
-          {error ? "Try again" : "Plan my trip"}
+          {error ? "Try again" : "Plan this trip"}
         </Button>
-        {(query || tripDates.dates.start) && (
-          <Button
-            variant="tertiary"
-            onClick={() => {
-              onQueryChange("");
-              tripDates.clear();
-              setTouched({ query: false, dates: false });
-              queryRef.current?.focus();
-            }}
-          >
-            Clear
-          </Button>
-        )}
       </div>
     </form>
   );

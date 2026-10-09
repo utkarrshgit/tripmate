@@ -35,7 +35,7 @@ export default function AccountMenu() {
           </div>
           <div className="divided">
             <Link role="menuitem" to="/trips" className="menu-item" onClick={close}>
-              <Icon name="bookmark" size={18} /> My trips
+              <Icon name="bookmark" size={18} /> Your trips
             </Link>
             <Link role="menuitem" to="/account" className="menu-item" onClick={close}>
               <Icon name="user" size={18} /> Account

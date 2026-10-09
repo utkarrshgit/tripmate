@@ -1,0 +1,131 @@
+{
+  "step-1": {
+    "width": 1200,
+    "height": 1200,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/how-it-works/step-1-480.avif",
+          "width": 480
+        },
+        {
+          "src": "/images/how-it-works/step-1-720.avif",
+          "width": 720
+        },
+        {
+          "src": "/images/how-it-works/step-1-960.avif",
+          "width": 960
+        },
+        {
+          "src": "/images/how-it-works/step-1-1200.avif",
+          "width": 1200
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/how-it-works/step-1-480.webp",
+          "width": 480
+        },
+        {
+          "src": "/images/how-it-works/step-1-720.webp",
+          "width": 720
+        },
+        {
+          "src": "/images/how-it-works/step-1-960.webp",
+          "width": 960
+        },
+        {
+          "src": "/images/how-it-works/step-1-1200.webp",
+          "width": 1200
+        }
+      ]
+    },
+    "fallback": "/images/how-it-works/step-1-1200.jpg"
+  },
+  "step-2": {
+    "width": 1200,
+    "height": 800,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/how-it-works/step-2-480.avif",
+          "width": 480
+        },
+        {
+          "src": "/images/how-it-works/step-2-720.avif",
+          "width": 720
+        },
+        {
+          "src": "/images/how-it-works/step-2-960.avif",
+          "width": 960
+        },
+        {
+          "src": "/images/how-it-works/step-2-1200.avif",
+          "width": 1200
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/how-it-works/step-2-480.webp",
+          "width": 480
+        },
+        {
+          "src": "/images/how-it-works/step-2-720.webp",
+          "width": 720
+        },
+        {
+          "src": "/images/how-it-works/step-2-960.webp",
+          "width": 960
+        },
+        {
+          "src": "/images/how-it-works/step-2-1200.webp",
+          "width": 1200
+        }
+      ]
+    },
+    "fallback": "/images/how-it-works/step-2-1200.jpg"
+  },
+  "step-3": {
+    "width": 1200,
+    "height": 800,
+    "sources": {
+      "avif": [
+        {
+          "src": "/images/how-it-works/step-3-480.avif",
+          "width": 480
+        },
+        {
+          "src": "/images/how-it-works/step-3-720.avif",
+          "width": 720
+        },
+        {
+          "src": "/images/how-it-works/step-3-960.avif",
+          "width": 960
+        },
+        {
+          "src": "/images/how-it-works/step-3-1200.avif",
+          "width": 1200
+        }
+      ],
+      "webp": [
+        {
+          "src": "/images/how-it-works/step-3-480.webp",
+          "width": 480
+        },
+        {
+          "src": "/images/how-it-works/step-3-720.webp",
+          "width": 720
+        },
+        {
+          "src": "/images/how-it-works/step-3-960.webp",
+          "width": 960
+        },
+        {
+          "src": "/images/how-it-works/step-3-1200.webp",
+          "width": 1200
+        }
+      ]
+    },
+    "fallback": "/images/how-it-works/step-3-1200.jpg"
+  }
+}

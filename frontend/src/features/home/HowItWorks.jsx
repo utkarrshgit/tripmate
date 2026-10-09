@@ -13,7 +13,7 @@ export default function HowItWorks() {
             title={step.title}
             body={step.body}
             image={step.image}
-            alt={step.alt}
+            illustration
             soft={i % 2 === 1}
             reversed={i % 2 === 1}
             action={

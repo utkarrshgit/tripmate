@@ -15,7 +15,7 @@ export default function DetailChecklist({ query, dates }) {
   const hints = { days: hasDates ? `From your dates: ${plural(daysBetween(dates.start, dates.end) + 1, "day")}` : null };
   return (
     <Tile className="detail-checklist">
-      <p className="t-body-sm-strong c-ink">What we've picked up so far</p>
+      <p className="t-body-sm-strong c-ink">What we found in your request</p>
       <ul className="divided">
         {REQUEST_DETAILS.map((d) => (
           <li key={d.id} className={cx("detail-check", found[d.id] && "is-found")}>
@@ -23,7 +23,7 @@ export default function DetailChecklist({ query, dates }) {
               <Icon name={found[d.id] ? "check" : "circle"} size={18} />
             </span>
             <span className="t-body-sm c-ink">{d.label}</span>
-            <span className="t-body-sm c-mute detail-check-hint">{hints[d.id] ?? (found[d.id] ? "Got it" : d.hint)}</span>
+            <span className="t-body-sm c-mute detail-check-hint">{hints[d.id] ?? (found[d.id] ? "Found" : d.hint)}</span>
           </li>
         ))}
       </ul>

@@ -28,6 +28,10 @@
   max-width: 440px;
   margin: 0 auto;
 }
+/* Illustrations keep their own shape and can use the full column */
+.feature-row-media.is-illustration .pin-card {
+  max-width: none;
+}
 @media (max-width: 768px) {
   .feature-row {
     grid-template-columns: minmax(0, 1fr);
@@ -37,7 +41,7 @@
   }
 }
 @media (max-width: 480px) {
-  .feature-row-media .pin-card {
+  .feature-row-media:not(.is-illustration) .pin-card {
     aspect-ratio: 1 / 1 !important;
     max-width: none;
   }

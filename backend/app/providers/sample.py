@@ -62,7 +62,7 @@ class SampleStayPricer:
             PriceQuote(
                 kind="stay",
                 name=name,
-                detail=f"{detail} · {rooms} room{'s' if rooms > 1 else ''} × {nights} night{'s' if nights > 1 else ''}",
+                detail=f"{detail} · {rooms} room{'s' if rooms > 1 else ''} for {nights} night{'s' if nights > 1 else ''}",
                 price=round(rate * rooms * nights, -1),
             )
             for name, detail, rate in nightly

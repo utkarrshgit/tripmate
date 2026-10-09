@@ -2,29 +2,26 @@ import { featureImages } from "@/data/images";
 
 export const HERO = {
   title: "Plan the trip you keep dreaming about",
-  body: "One sentence in. A costed, day-by-day trip out.",
+  body: "Describe your trip in one sentence. Get a day-by-day plan with the costs worked out.",
 };
 
 export const HOW_IT_WORKS = [
   {
     image: featureImages.describe,
-    alt: "A traveller writing down trip ideas",
     title: "Describe it in one sentence",
-    body: "Where, how long, who and how much.",
-    cta: { label: "Try a request", to: "/plan" },
+    body: "Say where, how long, who's going, and your budget.",
+    cta: { label: "Describe your trip", to: "/plan" },
   },
   {
     image: featureImages.research,
-    alt: "A map with a planned route",
-    title: "Specialist planners do the legwork",
-    body: "Nine planners, one after another.",
+    title: "Specialist planners do the work",
+    body: "Nine planners work through your trip, one after another.",
     cta: { label: "Meet the planners", href: "#planners" },
   },
   {
     image: featureImages.review,
-    alt: "A day-by-day itinerary laid out on a table",
-    title: "Review, adjust, save",
-    body: "Tweak it, re-plan it, save it.",
+    title: "Review, change, and save",
+    body: "Change your request, plan again, and save the version you like.",
     cta: { label: "Plan a trip", to: "/plan" },
   },
 ];

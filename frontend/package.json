@@ -5,16 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "images": "node scripts/optimize-images.mjs",
+    "brand": "node scripts/brand-assets.mjs"
   },
   "dependencies": {
-    "@yogesharc/thinking-orbs": "0.1.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.4.1",
+    "sharp": "0.35.4",
     "vite": "^6.0.0"
   }
 }

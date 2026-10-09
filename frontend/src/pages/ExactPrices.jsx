@@ -20,7 +20,7 @@ function SaveNewTrip({ plan, query, pricing }) {
   if (saved) {
     return (
       <Button as={Link} to={`/trips/${saved.id}`} icon="check" className="swap-in">
-        Saved — view trip
+        View saved trip
       </Button>
     );
   }
@@ -38,7 +38,7 @@ function UpdateSavedTrip({ trip, pricing }) {
   if (done) {
     return (
       <Button as={Link} to={`/trips/${trip.id}`} icon="check" className="swap-in">
-        Saved — back to trip
+        View saved trip
       </Button>
     );
   }
@@ -89,7 +89,7 @@ function NewTripPrices() {
           </Button>
         }
       >
-        <p className="t-body-md c-body">Exact prices are checked for a planned trip.</p>
+        <p className="t-body-md c-body">Plan a trip, then check its exact prices.</p>
       </SystemPage>
     );
   }

@@ -38,19 +38,19 @@ export default function OptionsSection({ plan }) {
   const transport = (plan.transport_options ?? []).map((o) => ({ label: o.mode, price: o.estimated_cost }));
   const stays = (plan.hotel_options ?? []).map((o) => ({
     label: o.name,
-    meta: `${plural(o.rooms, "room")} · ${rupees(o.nightly_rate)}/night`,
+    meta: `${plural(o.rooms, "room")} · ${rupees(o.nightly_rate)} a night`,
     price: o.estimated_total,
   }));
   if (!transport.length && !stays.length) return null;
 
   return (
-    <Section id="options" title="Getting there & staying">
+    <Section id="options" title="Getting there and staying">
       <Reveal className="option-groups">
-        <OptionGroup icon="train" title="Travel" options={transport} />
+        <OptionGroup icon="train" title="Getting there" options={transport} />
         <OptionGroup icon="bed" title="Stays" options={stays} />
       </Reveal>
       <p className="t-caption-md c-mute inline-icon option-key">
-        <Icon name="check" size={14} /> counted in your total
+        <Icon name="check" size={14} /> Counted in your total
       </p>
     </Section>
   );

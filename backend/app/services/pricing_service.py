@@ -21,7 +21,7 @@ class PricingService:
             return PriceResponse(
                 status="unavailable",
                 source="none",
-                message="Exact pricing isn't connected yet. Your plan's estimates are still a good guide.",
+                message="Exact prices aren't connected yet. Your plan's estimates are still a good guide.",
                 fetched_at=now,
             )
 
@@ -43,7 +43,7 @@ class PricingService:
 
         message = None
         if transport is not None and not request.origin:
-            message = "Add where you're travelling from to see transport prices."
+            message = "Add your starting city to view transport prices."
 
         return PriceResponse(
             status="ok",

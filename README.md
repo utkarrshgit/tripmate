@@ -16,7 +16,7 @@ From that one line, TripMate works out where you're going, when, for how long, w
 - **Plans the whole trip.** You get a day-by-day itinerary with morning, afternoon and evening plans, a cost breakdown (travel, stays, food, activities), and options for getting there and where to stay.
 - **Shows the numbers.** The total cost is compared against your budget, with cost per day and per person.
 - **Estimates first, exact prices on request.** Every plan uses **estimated** prices so you can shape the trip quickly. When the trip looks right, **Get exact prices** checks real fares and rooms for your dates and compares them with the estimate.
-- **Shows the AI at work.** While a trip is being planned, animated indicators show which planner is working and what it's doing.
+- **Shows the AI at work.** While a trip is being planned, a single line shows what the planners are doing, step by step, and how long it took.
 - **Saves trips.** Create an account to save plans, along with any exact-price checks, and come back to them later.
 
 ## How it works
@@ -62,7 +62,7 @@ TripMate is an early-stage project. Today:
 |---|---|
 | Website | React 19 and Vite, styled from a Pinterest-inspired design system ([DESIGN.md](DESIGN.md)) |
 | API and planners | Python with FastAPI; one agent class per planner |
-| AI activity indicators | [Thinking Orbs](https://thinkingorbs.com) |
+| AI activity indicator | ThoughtLine, adapted from [React Bits](https://reactbits.dev) |
 | Optional language model | [Ollama](https://ollama.com) (local) |
 
 ## What's in this repository

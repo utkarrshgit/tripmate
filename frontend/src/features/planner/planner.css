@@ -49,6 +49,7 @@
 
 /* When: date range */
 .date-range {
+  position: relative;
   /* keep the form's stack spacing on top */
   margin-right: 0;
   margin-bottom: 0;
@@ -74,6 +75,74 @@
 .date-input .input {
   min-width: 0;
 }
+/* Field-style button that opens the calendar */
+.date-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  width: 100%;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.date-trigger > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.date-trigger svg {
+  flex: none;
+  color: var(--color-mute);
+}
+.date-trigger.is-empty > span {
+  color: var(--color-ash);
+}
+.date-trigger.is-open {
+  border-color: var(--color-ink);
+}
+
+/* The calendar popover: canvas card, hairline edge, no shadow */
+.date-popover {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 0;
+  display: grid;
+  gap: var(--spacing-md);
+  width: min(640px, 100%);
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-md);
+  background: var(--color-canvas);
+  animation: rise-in var(--motion-fast) var(--motion-ease) both;
+}
+.date-popover:not(:has(.is-two)) {
+  width: min(360px, 100%);
+}
+.date-popover-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+.date-popover-months {
+  display: grid;
+  gap: var(--spacing-xl);
+}
+.date-popover-months.is-two {
+  grid-template-columns: 1fr 1fr;
+}
+.date-popover-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-hairline);
+}
 .date-range-arrow {
   flex: none;
   margin-bottom: 13px;
@@ -93,74 +162,6 @@
   gap: var(--spacing-xl);
   animation: rise-in var(--motion-slow) var(--motion-ease) both;
 }
-.planning-head {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-lg);
-}
-/* The current planner's orb, on a canvas disc; it cross-fades as planners hand over */
-.planning-head-orb {
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 64px;
-  height: 64px;
-  border-radius: var(--rounded-full);
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  animation: scale-in var(--motion-base) var(--motion-ease) both;
-}
-.planning-caption {
-  animation: fade-in var(--motion-base) var(--motion-ease) both;
-}
-.planning-steps {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--spacing-sm);
-}
-.planning-step {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
-  border-radius: var(--rounded-md);
-  background: var(--color-canvas);
-  color: var(--color-ash);
-  transition: color var(--motion-base) var(--motion-ease);
-}
-.planning-step-icon {
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  border-radius: var(--rounded-full);
-  background: var(--color-surface-card);
-}
-.planning-step.is-active {
-  color: var(--color-ink);
-}
-.planning-step.is-active .planning-step-icon {
-  background: var(--color-surface-card);
-}
-.planning-step.is-done {
-  color: var(--color-success-deep);
-}
-.planning-step.is-done .planning-step-icon {
-  background: var(--color-success-pale);
-  animation: pop var(--motion-base) var(--motion-ease) both;
-}
-@media (max-width: 768px) {
-  .planning-steps {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-@media (max-width: 480px) {
-  .planning-steps {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
 /* Skeleton preview of the results, shown under the progress card */
 .planning-preview {
   margin-top: var(--spacing-xxl);

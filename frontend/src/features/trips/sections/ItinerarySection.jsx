@@ -31,8 +31,9 @@ export default function ItinerarySection({ plan }) {
         {days.map((day) => (
           <Tile key={day.day} className="day-card">
             <div className="day-head">
-              <span className="day-number" aria-label={`Day ${day.day}`}>
-                {String(day.day).padStart(2, "0")}
+              <span className="day-number">
+                <span aria-hidden="true">{String(day.day).padStart(2, "0")}</span>
+                <span className="visually-hidden">Day {day.day}</span>
               </span>
               {day.date && <span className="t-body-sm-strong c-mute">{formatDay(day.date)}</span>}
             </div>

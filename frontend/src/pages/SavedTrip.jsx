@@ -23,15 +23,15 @@ export default function SavedTrip() {
   return (
     <div className="container section">
       <Button as={Link} to="/trips" variant="tertiary" icon="arrowLeft" className="back-link no-print">
-        My trips
+        Your trips
       </Button>
       {trip.pricing && (
         <Notice icon="check" tone="success" className="saved-pricing">
           <p className="t-body-sm">
-            Exact prices checked on {formatDate(trip.pricing.checkedAt)}: <strong>{rupees(trip.pricing.total)}</strong>
+            Exact prices checked {formatDate(trip.pricing.checkedAt)}: <strong>{rupees(trip.pricing.total)}</strong> total
             {trip.pricing.response?.is_sample ? " (sample prices)" : ""}.{" "}
             <Link to={`/trips/${trip.id}/prices`} className="link-inline">
-              See details <Icon name="arrowRight" size={14} />
+              View details <Icon name="arrowRight" size={14} />
             </Link>
           </p>
         </Notice>
@@ -63,7 +63,7 @@ export default function SavedTrip() {
         }
         extraActions={
           <Button variant="tertiary" icon="trash" onClick={() => setConfirming(true)}>
-            Delete
+            Delete trip
           </Button>
         }
       />

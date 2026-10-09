@@ -2,7 +2,8 @@ import { List, P } from "../blocks";
 
 /*
  * Terms and Conditions content. Text in [square brackets] is a placeholder to replace
- * before launch. Each section needs a unique `id` (used as its anchor).
+ * before launch. Each section needs a unique `id` (used as its anchor). Sections sharing a
+ * `group` are listed together under that heading in the contents menu; the rest stand alone.
  */
 export default {
   title: "Terms and Conditions",
@@ -12,6 +13,7 @@ export default {
   sections: [
     {
       id: "the-service",
+      group: "The service",
       title: "What TripMate is",
       body: (
         <>
@@ -20,49 +22,51 @@ export default {
             itinerary with estimated costs.
           </P>
           <P>
-            TripMate is not a travel agent. We do not sell, book or guarantee transport, accommodation, activities or any
-            other travel service.
+            TripMate is not a travel agent. We do not sell, book, or guarantee transport, accommodation, activities, or any other travel service.
           </P>
         </>
       ),
     },
     {
       id: "estimates",
+      group: "The service",
       title: "Prices are estimates",
       body: (
         <P>
-          Every cost shown on TripMate is an estimate meant to help you plan. Real fares, room rates, opening hours and
-          availability change often and may differ a lot from what we show. Always check with the provider before you book
+          Every cost shown on TripMate is an estimate meant to help you plan. Real fares, room rates, opening hours, and availability change often and may differ a lot from what we show. Always check with the provider before you book
           or pay for anything.
         </P>
       ),
     },
     {
       id: "automated-content",
+      group: "The service",
       title: "Automatically generated plans",
       body: (
         <P>
-          Plans are generated automatically and may be incomplete, out of date or wrong — for example, a destination may be
-          misread or an activity may not suit your group. Use your own judgement, check travel advisories and local rules,
-          and don't rely on TripMate for safety, health, visa or legal decisions.
+          Plans are generated automatically and may be incomplete, out of date, or wrong — for example, a destination may be
+          misread or an activity may not suit your group. Use your own judgment, check travel advisories and local rules,
+          and do not rely on TripMate for safety, health, visa, or legal decisions.
         </P>
       ),
     },
     {
       id: "your-account",
+      group: "Using TripMate",
       title: "Your account",
       body: (
         <List
           items={[
             "Give accurate details when you sign up, and keep your email up to date.",
             "You are responsible for activity on your account. Tell us right away if you think someone else has used it.",
-            "You can delete your account at any time from your Account page.",
+            "You can delete your account at any time in Account.",
           ]}
         />
       ),
     },
     {
       id: "acceptable-use",
+      group: "Using TripMate",
       title: "Acceptable use",
       body: (
         <>
@@ -71,7 +75,7 @@ export default {
             items={[
               "Break any law, or use TripMate to plan anything unlawful.",
               "Submit content that is abusive, harmful, or that infringes someone else's rights.",
-              "Scrape, overload, reverse engineer or interfere with the service, or access it with automated tools without our permission.",
+              "Scrape, overload, reverse engineer, or interfere with the service, or access it with automated tools without our permission.",
               "Include other people's personal information in requests without their permission.",
             ]}
           />
@@ -80,23 +84,24 @@ export default {
     },
     {
       id: "ip",
+      group: "Using TripMate",
       title: "Intellectual property",
       body: (
         <P>
-          TripMate's software, design and branding belong to [Company name]. You may use the plans TripMate generates for
+          TripMate's software, design, and branding belong to [Company name]. You may use the plans TripMate generates for
           your own personal travel planning. You keep ownership of the requests you write.
         </P>
       ),
     },
     {
       id: "liability",
+      group: "Legal terms",
       title: "Disclaimers and liability",
       body: (
         <>
           <P>
             TripMate is provided “as is”, without warranties of any kind. To the extent the law allows, [Company name] is
-            not liable for any loss arising from your use of, or reliance on, TripMate's plans or estimates — including
-            travel costs, missed bookings or changed plans.
+            not liable for any loss arising from your use of, or reliance on, TripMate's plans or estimates — including travel costs, missed bookings, or changed plans.
           </P>
           <P>[Set out any liability cap and the consumer rights that cannot be excluded under applicable law.]</P>
         </>
@@ -104,16 +109,18 @@ export default {
     },
     {
       id: "suspension",
+      group: "Legal terms",
       title: "Suspension and termination",
       body: (
         <P>
-          We may suspend or close accounts that break these terms. We may also change or stop parts of the service; where
-          we can, we'll give you notice first so you can download your saved trips.
+          We may suspend or close accounts that break these terms. We may also change or stop parts of the service. Where
+          we can, we will give you notice first so you can download your saved trips.
         </P>
       ),
     },
     {
       id: "law",
+      group: "Legal terms",
       title: "Governing law and disputes",
       body: (
         <P>
@@ -124,10 +131,11 @@ export default {
     },
     {
       id: "changes",
+      group: "Legal terms",
       title: "Changes to these terms",
       body: (
         <P>
-          We may update these terms from time to time. We'll revise the “Last updated” date and, for significant changes,
+          We may update these terms from time to time. We will update the date at the top of this page and, for significant changes,
           let you know before they take effect. If you keep using TripMate after that, you accept the updated terms.
         </P>
       ),
