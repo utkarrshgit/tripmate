@@ -16,14 +16,14 @@ class HotelAgent(BaseAgent):
 
         state["hotel_options"] = [
             {
-                "name": "Budget Stay",
+                "name": "Budget stay",
                 "category": "budget",
                 "nightly_rate": nightly,
                 "rooms": rooms,
                 "estimated_total": total,
             },
             {
-                "name": "Comfort Stay",
+                "name": "Comfort stay",
                 "category": "mid-range",
                 "nightly_rate": 3000,
                 "rooms": rooms,

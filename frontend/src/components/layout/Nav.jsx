@@ -66,7 +66,7 @@ export default function Nav() {
           {showSearch && (
             <IconButton
               icon={searchOpen ? "close" : "search"}
-              label="Describe a trip"
+              label={searchOpen ? "Close trip search" : "Search for a trip"}
               aria-expanded={searchOpen}
               className="nav-mobile"
               onClick={() => setSearchOpen((o) => !o)}

@@ -13,7 +13,7 @@ export default function MyTrips() {
   const [pendingDelete, setPendingDelete] = useState(null);
 
   if (!user) {
-    return <SignedOutPrompt title="Your trips live here" body="Log in to see the trip plans you've saved." />;
+    return <SignedOutPrompt title="Your trips" body="Log in to view your saved trips." />;
   }
 
   return (
@@ -21,7 +21,7 @@ export default function MyTrips() {
       <Section
         title="Your trips"
         as="h1"
-        intro={trips.length ? plural(trips.length, "saved plan") : "Nothing saved yet."}
+        intro={trips.length ? plural(trips.length, "saved trip") : "Nothing saved yet."}
         actions={
           trips.length > 0 && (
             <Button as={Link} to="/plan" icon="plus">
@@ -35,7 +35,7 @@ export default function MyTrips() {
             soft
             headingLevel={2}
             title="Save the plans you like"
-            body="When a plan looks right, tap “Save trip” on the results page. It'll be waiting here whenever you come back."
+            body={<>When a plan looks right, select <strong>Save trip</strong>. You'll find it here whenever you come back.</>}
             action={
               <Button as={Link} to="/plan" variant="primary">
                 Plan your first trip

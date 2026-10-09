@@ -19,7 +19,8 @@ class PlannerAgent(BaseAgent):
         travelers = self._extract_travelers(query)
         interests = self._extract_interests(query)
 
-        state["destination"] = destination
+        # "Unknown destination" is an internal marker; people see wording that works without a place.
+        state["destination"] = "" if destination == "Unknown destination" else destination
         state["days"] = days
         state["budget"] = budget
         state["travelers"] = travelers

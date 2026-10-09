@@ -114,10 +114,10 @@ export const MAX_TRIP_DAYS = 30;
 
 /** Validates a { start, end } pair. Returns an error message, or null when it's fine. */
 export function validateTripDates(dates, now = new Date()) {
-  if (!dates?.start || !dates?.end) return "Pick the dates you're travelling.";
-  if (dates.start < todayISO(now)) return "Your trip can't start in the past.";
-  if (dates.end < dates.start) return "The return date is before the start date.";
-  if (daysBetween(dates.start, dates.end) + 1 > MAX_TRIP_DAYS) return `Trips can be up to ${MAX_TRIP_DAYS} days long.`;
+  if (!dates?.start || !dates?.end) return "Select your travel dates.";
+  if (dates.start < todayISO(now)) return "Select a start date from today onward.";
+  if (dates.end < dates.start) return "Select a return date on or after the start date.";
+  if (daysBetween(dates.start, dates.end) + 1 > MAX_TRIP_DAYS) return `Select dates up to ${MAX_TRIP_DAYS} days apart.`;
   return null;
 }
 

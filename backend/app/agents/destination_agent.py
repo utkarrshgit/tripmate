@@ -6,7 +6,7 @@ class DestinationAgent(BaseAgent):
     name = "destination"
 
     async def run(self, state: AgentState) -> AgentState:
-        destination = state.get("destination", "Unknown destination")
+        destination = state.get("destination") or ""
         days = state.get("days", 3)
         interests = state.get("interests", [])
 
@@ -14,7 +14,7 @@ class DestinationAgent(BaseAgent):
             "destination": destination,
             "days": days,
             "interests": interests,
-            "summary": f"Trip research prepared for {destination}.",
+            "summary": f"Trip research prepared for {destination}." if destination else "Trip research prepared.",
             "best_for": interests or ["general sightseeing"],
         }
         return self.mark_completed(state)

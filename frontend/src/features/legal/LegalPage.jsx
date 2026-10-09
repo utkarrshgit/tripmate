@@ -77,7 +77,7 @@ export default function LegalPage({ doc }) {
           ))}
           {doc.related && (
             <p className="t-body-md c-body legal-related">
-              See also our{" "}
+              Read our{" "}
               <Link to={doc.related.to} className="link-inline">
                 {doc.related.label}
               </Link>

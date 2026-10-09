@@ -82,7 +82,7 @@ class SupervisorAgent:
         total = state.get("total_cost", 0)
 
         lines = [
-            f"TripMate plan for {state.get('destination', 'your trip')}",
+            f"TripMate plan for {state.get('destination') or 'your trip'}",
             f"Duration: {state.get('days', 0)} days",
             f"Travelers: {state.get('travelers', 1)}",
             f"Estimated total: ₹{total:,.0f}",
@@ -96,8 +96,8 @@ class SupervisorAgent:
 
         for day in state.get("itinerary", []):
             lines.append(
-                f"Day {day['day']}: {day['morning']} → "
-                f"{day['afternoon']} → {day['evening']}"
+                f"Day {day['day']}: {day['morning']} · "
+                f"{day['afternoon']} · {day['evening']}"
             )
 
         if state.get("issues"):

@@ -29,10 +29,5 @@ export function useTripDates(query, initial = null) {
     setSource("picker");
   }, []);
 
-  const clear = useCallback(() => {
-    setDates(EMPTY);
-    setSource(null);
-  }, []);
-
-  return { dates, source, pick, clear };
+  return { dates, source, pick };
 }

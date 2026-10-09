@@ -11,10 +11,10 @@ export default function HomeHero({ onPlan }) {
         <p className="t-body-md c-body home-hero-sub">{HERO.body}</p>
         <div className="row home-hero-actions">
           <Button as={Link} to="/plan">
-            Start planning
+            Plan a trip
           </Button>
           <Button as="a" href="#how-it-works" variant="tertiary">
-            See how it works
+            How it works
           </Button>
         </div>
         <ExamplePrompts title="Try one of these" onPick={onPlan} className="home-examples" />

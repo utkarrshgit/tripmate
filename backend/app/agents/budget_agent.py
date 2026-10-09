@@ -17,7 +17,7 @@ class BudgetAgent(BaseAgent):
         budget = state.get("budget", 0)
         if budget and total > budget:
             state.setdefault("issues", []).append(
-                f"Estimated cost ₹{total:,.0f} exceeds the ₹{budget:,.0f} budget."
+                f"The estimate of ₹{total:,.0f} is more than your ₹{budget:,.0f} budget."
             )
 
         return self.mark_completed(state)

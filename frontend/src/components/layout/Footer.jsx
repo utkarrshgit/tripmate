@@ -56,7 +56,7 @@ export default function Footer() {
           ))}
           <Column title="Good to know" accordion={accordion}>
             <li>
-              Every price on TripMate is an estimate to help you plan. Check real fares, rates and availability before you
+              Every price on TripMate is an estimate to help you plan. Check real fares, rates, and availability before you
               book.
             </li>
           </Column>

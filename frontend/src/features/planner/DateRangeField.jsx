@@ -63,7 +63,7 @@ const DateRangeField = forwardRef(function DateRangeField({ dates, source, error
         {error ??
           (complete
             ? `${formatDateRange(dates.start, dates.end)} · ${plural(daysBetween(dates.start, dates.end) + 1, "day")}${
-                source === "prompt" ? " — picked up from your text" : ""
+                source === "prompt" ? " — from your request" : ""
               }`
             : "Or type them in your request, like “12–16 Dec”.")}
       </p>

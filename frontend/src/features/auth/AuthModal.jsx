@@ -8,14 +8,14 @@ import { validateAccount } from "./validation";
 const COPY = {
   signup: {
     title: "Welcome to TripMate",
-    body: "Create an account to save your trip plans.",
+    body: "Create an account to save your trips.",
     switchPrompt: "Already a member?",
     switchTo: "login",
     switchLabel: "Log in",
   },
   login: {
     title: "Welcome back",
-    body: "Log in to see your saved trips.",
+    body: "Log in to view your saved trips.",
     switchPrompt: "New to TripMate?",
     switchTo: "signup",
     switchLabel: "Sign up",

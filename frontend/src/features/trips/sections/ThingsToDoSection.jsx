@@ -11,13 +11,13 @@ export default function ThingsToDoSection({ plan }) {
     ...(plan.food_options ?? []).map((f) => ({
       key: f.category,
       name: titleCase(f.category),
-      price: `${rupees(f.estimated_daily_per_person)}/day each`,
+      price: `${rupees(f.estimated_daily_per_person)} per person a day`,
     })),
   ];
   if (!items.length) return null;
 
   return (
-    <Section id="things-to-do" title="Things to do & eat">
+    <Section id="things-to-do" title="Things to do and eat">
       <Masonry>
         {items.map((item, i) => (
           <PinCard

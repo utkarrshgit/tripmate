@@ -19,7 +19,7 @@ export default function PlannerSearch({ autoFocus = false, onSubmitted, classNam
     <SearchBar
       label="Describe a trip"
       submitLabel="Plan this trip"
-      placeholder="Describe a trip, e.g. 4 days to Goa under ₹25000"
+      placeholder="Describe a trip, like 4 days in Goa under ₹25,000"
       value={value}
       onChange={setValue}
       onSubmit={submit}

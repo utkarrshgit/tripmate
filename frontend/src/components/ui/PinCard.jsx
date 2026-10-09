@@ -15,8 +15,9 @@ function PinMedia({ src, alt }) {
 
   if (!src) {
     // Empty slot: the card's own surface-card fill, until a photo is configured in data/images.js.
+    // There's no picture yet, so it's hidden from screen readers rather than announced as an image.
     return (
-      <div className="pin-slot" role={alt ? "img" : undefined} aria-label={alt || undefined}>
+      <div className="pin-slot" aria-hidden="true">
         <Icon name="image" size={28} strokeWidth={1.5} />
       </div>
     );

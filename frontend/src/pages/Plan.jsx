@@ -73,7 +73,7 @@ export default function Plan() {
     <div className="container container-narrow section">
       <div className="stack-sm page-intro">
         <h1 className="t-heading-xl">Where do you want to go?</h1>
-        <p className="t-body-md c-body">One sentence and your dates. Prices come back as estimates.</p>
+        <p className="t-body-md c-body">Describe your trip in a sentence and add your dates. Prices are estimates until you check exact prices.</p>
       </div>
       <TripRequestForm
         query={query}

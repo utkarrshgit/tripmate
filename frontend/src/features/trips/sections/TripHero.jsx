@@ -1,7 +1,7 @@
 import { Chip, ChipStrip, Icon, PinCard, StatusPill } from "@/components/ui";
 import { imageForDestination } from "@/data/images";
 import { formatDateRange, plural, rupees } from "@/utils/format";
-import { titleCase } from "../tripMeta";
+import { titleCase, tripName } from "../tripMeta";
 
 /** Plans only ever carry estimates; exact prices are a separate step. */
 function EstimateTag() {
@@ -43,13 +43,14 @@ function BudgetMeter({ total, budget }) {
         aria-valuemax={budget}
         aria-valuenow={total}
         aria-label="Estimated total against your budget"
+        aria-valuetext={`${rupees(total)} of your ${rupees(budget)} budget`}
       >
         <span className="meter-fill" style={{ width: `${fill}%` }} />
         <span className="meter-tick" style={{ left: `${tick}%` }} />
       </div>
       <p className={`t-body-sm-strong inline-icon ${over ? "c-error" : "c-success"}`}>
         <Icon name={over ? "alert" : "check"} size={16} />
-        {over ? `${rupees(total - budget)} over budget` : `${rupees(budget - total)} to spare`}
+        {over ? `${rupees(total - budget)} over budget` : `${rupees(budget - total)} under budget`}
       </p>
     </div>
   );
@@ -59,7 +60,7 @@ export default function TripHero({ plan, query, eyebrow, actions }) {
   const days = Math.max(plan.days, 1);
   const travelers = Math.max(plan.travelers, 1);
   // Issues the meter already shows (over budget) aren't repeated as text.
-  const issues = (plan.issues ?? []).filter((i) => !/exceeds the .* budget/i.test(i));
+  const issues = (plan.issues ?? []).filter((i) => !/(?:exceeds the|is more than your) .* budget/i.test(i));
 
   return (
     <header className="trip-hero">
@@ -70,7 +71,7 @@ export default function TripHero({ plan, query, eyebrow, actions }) {
       <div className="trip-hero-body stack-xl">
         <div className="stack-md">
           {eyebrow && <p className="t-body-sm-strong c-mute">{eyebrow}</p>}
-          <h1 className="t-display-lg">{plan.destination || "Your trip"}</h1>
+          <h1 className="t-display-lg">{tripName(plan)}</h1>
           <ChipStrip>
             <Chip>
               <Icon name="calendar" size={16} />{" "}

@@ -13,10 +13,10 @@ async function request(path, options) {
   try {
     response = await fetch(`${API_URL}${path}`, options);
   } catch {
-    throw new ApiError("The planner can't be reached right now.", { unreachable: true });
+    throw new ApiError("We can't reach the trip planner right now.", { unreachable: true });
   }
   if (!response.ok) {
-    throw new ApiError("The planner couldn't finish this request.", { status: response.status });
+    throw new ApiError("We couldn't plan this trip.", { status: response.status });
   }
   return response.json();
 }

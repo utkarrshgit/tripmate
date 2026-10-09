@@ -28,7 +28,7 @@ export default function UnavailablePanel({ onRecovered }) {
           label={checking ? "Checking the planner" : "Waiting for the planner"}
         />
       }
-      title="The planner is taking a break"
+      title="We can't reach the trip planner"
       actions={
         <>
           <Button variant="primary" icon="refresh" onClick={retry} disabled={checking}>
@@ -41,11 +41,11 @@ export default function UnavailablePanel({ onRecovered }) {
       }
     >
       <p className="t-body-md c-body">
-        We can't reach TripMate's planning service right now. Nothing you typed has been lost — try again in a minute.
+        Your request is safe. Wait a minute, then select <strong>Try again</strong>.
       </p>
       {stillDown && (
         <p className="t-body-sm c-error swap-in" role="status">
-          Still unavailable. Please try again shortly.
+          The planner still isn't available. Try again in a few minutes.
         </p>
       )}
     </SystemPage>

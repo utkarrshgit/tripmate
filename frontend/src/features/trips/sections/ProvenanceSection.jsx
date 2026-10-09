@@ -28,7 +28,7 @@ export default function ProvenanceSection({ plan }) {
           <>
             <pre className="t-body-sm c-body summary-text">{plan.final_response}</pre>
             <Button variant="tertiary" icon={copied ? "check" : "copy"} onClick={() => copy(plan.final_response)}>
-              {copied ? "Copied" : "Copy"}
+              {copied ? "Copied" : "Copy summary"}
             </Button>
           </>
         )}

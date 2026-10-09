@@ -81,4 +81,12 @@ def test_sample_pricing_without_origin_skips_transport(monkeypatch):
     monkeypatch.setattr(settings, "pricing_provider", "sample")
     body = price(origin=None).json()
     assert body["transport"] == [] and body["stays"]
-    assert "travelling from" in body["message"]
+    assert "starting city" in body["message"]
+
+
+def test_unknown_destination_never_reaches_people():
+    body = client.post("/api/trips/plan", json={"query": "something fun for 2 people"}).json()
+    text = str(body)
+    assert body["destination"] == ""
+    assert "Unknown destination" not in text
+    assert "We couldn't tell where you're going" in " ".join(body["issues"])

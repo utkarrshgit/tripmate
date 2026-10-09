@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, TextField } from "@/components/ui";
 
-/** "Travelling from" + the button that fetches exact prices. */
+/** "Starting city" + the button that fetches exact prices. */
 export default function OriginForm({ initialOrigin = "", hasResult, loading, onSubmit }) {
   const [origin, setOrigin] = useState(initialOrigin);
 
@@ -14,10 +14,10 @@ export default function OriginForm({ initialOrigin = "", hasResult, loading, onS
       }}
     >
       <TextField
-        label="Travelling from"
+        label="Starting city"
         value={origin}
         onChange={(e) => setOrigin(e.target.value)}
-        placeholder="e.g. Delhi"
+        placeholder="Delhi"
         autoComplete="address-level2"
         help="Needed for flight and train prices. Leave it empty to price stays only."
       />

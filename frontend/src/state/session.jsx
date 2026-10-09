@@ -67,7 +67,7 @@ export function SessionProvider({ children }) {
   const logIn = useCallback(
     ({ email }) => {
       const account = read(KEYS.users, {})[normalise(email)];
-      if (!account) throw new Error("We couldn't find an account with that email.");
+      if (!account) throw new Error("We couldn't find an account with that email. Check it, or sign up instead.");
       startSession(account);
     },
     [startSession],
@@ -84,7 +84,7 @@ export function SessionProvider({ children }) {
       const users = read(KEYS.users, {});
       const nextEmail = normalise(email);
       if (nextEmail !== user.email && users[nextEmail]) {
-        throw new Error("Another account already uses this email.");
+        throw new Error("Another account uses this email. Enter a different one.");
       }
       const account = { ...user, name: name.trim(), email: nextEmail };
       const { [user.email]: _old, ...rest } = users;

@@ -4,6 +4,6 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function validateAccount({ name, email }, { requireName = true } = {}) {
   const errors = {};
   if (requireName && !name?.trim()) errors.name = "Enter your name.";
-  if (!EMAIL_RE.test(email?.trim() ?? "")) errors.email = "Enter a valid email address.";
+  if (!EMAIL_RE.test(email?.trim() ?? "")) errors.email = "Enter an email address, like name@example.com.";
   return errors;
 }

@@ -27,7 +27,7 @@ function TripActions({ plan, query }) {
   } else if (saved) {
     save = (
       <Button as={Link} to={`/trips/${saved.id}`} icon="check" className="swap-in">
-        Saved — view in My trips
+        View saved trip
       </Button>
     );
   } else {
