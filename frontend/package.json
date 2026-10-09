@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "images": "node scripts/optimize-images.mjs"
+    "images": "node scripts/optimize-images.mjs",
+    "brand": "node scripts/brand-assets.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",

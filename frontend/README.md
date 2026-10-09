@@ -6,9 +6,19 @@ React 19 + Vite, styled strictly from [`/DESIGN.md`](../DESIGN.md) (Pinterest-ba
 npm install
 npm run dev      # http://localhost:5173 — expects the API on http://localhost:8000
 npm run build
+npm run images   # rebuild optimised images from images/destinations/ and images/how-it-works/
+npm run brand    # rebuild favicons, app icons, the web manifest and link-preview images
 ```
 
-Set `VITE_API_URL` to point at a different API.
+Set `VITE_API_URL` to point at a different API. For a public build, set `VITE_SITE_URL` to the site's address (see `.env.example`): it's used for canonical links, link-preview images and the sitemap.
+
+## Search and link previews
+
+- Every page's title, description, link-preview image and whether search engines may index it live in `src/config/seo.js`. Private or mid-flow pages (trips, account, prices) are `noindex`.
+- The build writes those tags into the HTML of each public page (`dist/plan/index.html` and so on), so search engines and link previews see them without running JavaScript. It also writes `sitemap.xml` and `robots.txt`. In the app, `app/useHead.js` keeps the tags in step as people move between pages.
+- Link-preview images (1200×630) are in `public/og/`, built by `npm run brand` from the "How it works" illustrations. Change their wording in `scripts/brand-assets.mjs`. The script needs the Inter font installed.
+- The home page also carries structured data (schema.org `WebSite` and `WebApplication`).
+- Host on anything that serves `dist/<path>/index.html` for `/<path>` and falls back to `dist/index.html` for other routes.
 
 ## Structure
 
@@ -50,13 +60,14 @@ Import from `src` with the `@/` alias, e.g. `import { Button } from "@/component
 
 | To… | Do this |
 |---|---|
-| Add a page | Create `pages/X.jsx`, add it to `app/routes.jsx` (path, title, skeleton). Add it to `components/layout/navLinks.js` if it belongs in the nav or footer. |
+| Add a page | Create `pages/X.jsx`, add it to `app/routes.jsx` (path, skeleton) and to `config/seo.js` (title, description, `index`). Add it to `components/layout/navLinks.js` if it belongs in the nav or footer. |
 | Add a section to the trip plan | Create a component in `features/trips/sections/` that takes `{ plan, query, onEditRequest }` and returns `null` when it has no data, then add it to `TRIP_SECTIONS` in `sections/index.js`. |
-| Add photos | Put files in `public/images/` and set their paths in `data/images.js`. Empty slots render as cream cards at the right ratio. |
+| Add or replace a destination photo | Put the original in `images/destinations/` (named after the destination, e.g. `goa.jpg`), run `npm run images`, and add its alt text in `src/data/images.js`. The script makes AVIF, WebP and JPEG versions in several sizes; only changed photos are rebuilt. Destinations without a photo show an empty cream card. |
+| Replace a "How it works" illustration | Replace `images/how-it-works/step-1.png` (or 2, 3) and run `npm run images`. Alt text is in `src/data/images.js`. Illustrations show at their own shape, uncropped. |
 | Change legal text | Edit `features/legal/content/*.jsx`. |
 | Change how dates are read from text | `features/planner/dateParsing.js`: pure functions; add a rule to `RULES`. |
 | Add a destination or interest | `data/catalog.js`. Interests must match the backend parser's keywords. |
-| Show AI activity somewhere new | Use `<AgentOrb state="…">` (or `<PlannerOrb planner={…}>` for a backend planner) from `@/components/ui`. Each planner's state lives in `PLANNERS` in `data/catalog.js`. |
+| Show AI activity somewhere new | Use `<ThoughtLine>` from `@/components/ui`: `working` while it runs, `steps` for the trace, `doneLabel` for the settled sentence. Planner step wording (`doing`, `did`) lives in `PLANNERS` in `data/catalog.js`. |
 | Hook up real auth / saved trips | Replace the localStorage functions in `state/session.jsx`; components only use `useSession()`. |
 
 ## Design and motion rules
@@ -65,5 +76,5 @@ Import from `src` with the `@/` alias, e.g. `import { Button } from "@/component
 - No hover states, no card shadows, no gradients (DESIGN.md policy). Pinterest Red is reserved for primary CTAs, the wordmark and the active-tab marker.
 - Motion lives in `styles/motion.css`: short durations, one easing curve, triggered by entering, pressing, opening or loading — never by hover. Wrap anything that should animate in on scroll with `<Reveal>` (or use `Masonry`/`TileGrid`, which do it for you).
 - Everything respects `prefers-reduced-motion`.
-- AI activity is shown with Thinking Orbs, only through `components/ui/AgentOrb.jsx`, which is the single import point for the library. A working orb is accent-purple (DESIGN.md's colour for predictive/recommendation callouts), so purple always means "AI is working". A finished or idle orb holds still in ink. Orbs are never Pinterest Red, which stays reserved for CTAs.
+- AI activity is shown with `ThoughtLine` (adapted from React Bits, no extra dependencies). Its sparkle is accent-purple while the AI is working (DESIGN.md's colour for predictive callouts) and ink once it settles. Never Pinterest Red, which stays reserved for CTAs.
 - Anything that loads should show a skeleton shaped like what's coming (`Skeleton`, `SkeletonText`, `SkeletonScreen`).
