@@ -65,7 +65,7 @@ export default function TripHero({ plan, query, eyebrow, actions }) {
   return (
     <header className="trip-hero">
       <div className="trip-hero-media">
-        <PinCard src={imageForDestination(plan.destination)} alt={plan.destination} ratio="4 / 5" large />
+        <PinCard src={imageForDestination(plan.destination)} ratio="4 / 5" sizes="(max-width: 768px) calc(100vw - 32px), 480px" large />
       </div>
 
       <div className="trip-hero-body stack-xl">

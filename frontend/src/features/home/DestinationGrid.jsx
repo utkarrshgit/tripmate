@@ -1,6 +1,6 @@
 import { Masonry, OverlayPill, PinCard, Section } from "@/components/ui";
 import { DESTINATIONS } from "@/data/catalog";
-import { destinationImages } from "@/data/images";
+import { destinationImages, naturalRatio } from "@/data/images";
 
 export default function DestinationGrid({ onPlan }) {
   return (
@@ -10,8 +10,7 @@ export default function DestinationGrid({ onPlan }) {
           <PinCard
             key={d.key}
             src={destinationImages[d.key]}
-            alt={d.name}
-            ratio={d.ratio}
+            ratio={naturalRatio(destinationImages[d.key]) ?? d.ratio}
             label={`Plan a trip to ${d.name}`}
             onClick={() => onPlan(d.prompt)}
             topLeft={<OverlayPill>{d.tag}</OverlayPill>}

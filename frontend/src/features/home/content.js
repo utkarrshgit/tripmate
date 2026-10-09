@@ -8,21 +8,18 @@ export const HERO = {
 export const HOW_IT_WORKS = [
   {
     image: featureImages.describe,
-    alt: "A traveler writing down trip ideas.",
     title: "Describe it in one sentence",
     body: "Say where, how long, who's going, and your budget.",
     cta: { label: "Describe your trip", to: "/plan" },
   },
   {
     image: featureImages.research,
-    alt: "A map with a planned route.",
     title: "Specialist planners do the work",
     body: "Nine planners work through your trip, one after another.",
     cta: { label: "Meet the planners", href: "#planners" },
   },
   {
     image: featureImages.review,
-    alt: "A day-by-day itinerary laid out on a table.",
     title: "Review, change, and save",
     body: "Change your request, plan again, and save the version you like.",
     cta: { label: "Plan a trip", to: "/plan" },

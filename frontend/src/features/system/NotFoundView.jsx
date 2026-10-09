@@ -58,7 +58,7 @@ export default function NotFoundView() {
       <div className="not-found-collage" aria-hidden="true">
         {COLLAGE.map((p, i) => (
           <div key={p.key} className="not-found-pin" style={{ gridArea: p.area, "--i": i }}>
-            <PinCard src={destinationImages[p.key]} ratio={p.ratio} bottomLeft={<OverlayPill>{p.pill}</OverlayPill>} />
+            <PinCard src={destinationImages[p.key]} ratio={p.ratio} sizes="200px" bottomLeft={<OverlayPill>{p.pill}</OverlayPill>} />
           </div>
         ))}
         <div className="not-found-pin not-found-center" style={{ gridArea: "c", "--i": 4 }}>
