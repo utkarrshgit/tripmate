@@ -1,19 +1,36 @@
 /*
- * Accounts and saved trips.
+ * The signed-in account, the sign-up window, and saved trips.
  *
- * TEMPORARY LOCAL STAND-IN: the backend has User/Trip models but no auth or
- * trip endpoints yet, so this keeps everything in the browser's localStorage.
- * There is no password — the User model has only name and email. Swap these
- * functions for API calls once the endpoints exist; the components only use
- * the context below.
+ * Accounts and email codes go through ./authApi.js (a local stand-in for the planned
+ * auth endpoints). Saved trips are still TEMPORARY LOCAL STAND-INS in localStorage until
+ * the trip endpoints exist. Components only use the context below.
  */
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import * as authApi from "./authApi";
 
 const KEYS = {
-  users: "tripmate:users",
   session: "tripmate:session",
   trips: (email) => `tripmate:trips:${email}`,
 };
+// The email waiting for a code, kept for this tab so a refresh reopens the code step.
+const PENDING_KEY = "tripmate:pendingCode";
+
+function readPending() {
+  try {
+    return JSON.parse(sessionStorage.getItem(PENDING_KEY)) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writePending(value) {
+  try {
+    if (value) sessionStorage.setItem(PENDING_KEY, JSON.stringify(value));
+    else sessionStorage.removeItem(PENDING_KEY);
+  } catch {
+    // Non-critical: a refresh then starts the window over.
+  }
+}
 
 function read(key, fallback) {
   try {
@@ -33,41 +50,75 @@ function write(key, value) {
   }
 }
 
-const normalise = (email) => email.trim().toLowerCase();
-
 const SessionContext = createContext(null);
 
 export function SessionProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const email = read(KEYS.session, null);
-    return email ? read(KEYS.users, {})[email] ?? null : null;
-  });
+  const [user, setUser] = useState(() => authApi.accountFor(read(KEYS.session, null)));
   const [trips, setTrips] = useState(() => (user ? read(KEYS.trips(user.email), []) : []));
-  const [authModal, setAuthModal] = useState(null); // null | "signup" | "login"
+  // The sign-up window: null when closed, else { step, ...details }. Steps: signup, login,
+  // forgot, code ({ email, purpose, resendAt, devCode }), newPassword ({ email, code }).
+  const [authModal, setAuthModal] = useState(() => {
+    const pending = readPending();
+    return pending ? { step: "code", ...pending } : null;
+  });
+  // What to do once signed in, like saving the trip that prompted the sign-up.
+  const afterAuth = useRef(null);
 
+  const openAuth = useCallback((step, { then } = {}) => {
+    afterAuth.current = then ?? null;
+    setAuthModal({ step });
+  }, []);
+
+  /** Moves the open window to another step. A code step is remembered for this tab. */
+  const goToStep = useCallback((step, details = {}) => {
+    writePending(step === "code" ? { email: details.email, purpose: details.purpose, resendAt: details.resendAt, devCode: details.devCode } : null);
+    setAuthModal({ step, ...details });
+  }, []);
+
+  const closeAuth = useCallback(() => {
+    writePending(null);
+    afterAuth.current = null;
+    setAuthModal(null);
+  }, []);
+
+  /** Signs in. The window stays open so it can show success; it calls finishAuth to close. */
   const startSession = useCallback((account) => {
     write(KEYS.session, account.email);
     setUser(account);
     setTrips(read(KEYS.trips(account.email), []));
-    setAuthModal(null);
+    writePending(null);
   }, []);
 
-  const signUp = useCallback(
-    ({ name, email }) => {
-      const users = read(KEYS.users, {});
-      const key = normalise(email);
-      if (users[key]) throw new Error("An account with this email already exists. Log in instead.");
-      const account = { name: name.trim(), email: key, createdAt: new Date().toISOString() };
-      write(KEYS.users, { ...users, [key]: account });
+  const finishAuth = useCallback(() => {
+    const then = afterAuth.current;
+    afterAuth.current = null;
+    setAuthModal(null);
+    then?.();
+  }, []);
+
+  const signUp = useCallback(async (values) => authApi.signUp(values), []);
+
+  /** Resolves to { verify } when the email still needs a code, or {} once signed in. */
+  const logIn = useCallback(
+    async (values) => {
+      const result = await authApi.logIn(values);
+      if (result.user) startSession(result.user);
+      return result;
+    },
+    [startSession],
+  );
+
+  const verifyEmail = useCallback(
+    async (values) => {
+      const { user: account } = await authApi.verifyEmail(values);
       startSession(account);
     },
     [startSession],
   );
 
-  const logIn = useCallback(
-    ({ email }) => {
-      const account = read(KEYS.users, {})[normalise(email)];
-      if (!account) throw new Error("We couldn't find an account with that email. Check it, or sign up instead.");
+  const resetPassword = useCallback(
+    async (values) => {
+      const { user: account } = await authApi.resetPassword(values);
       startSession(account);
     },
     [startSession],
@@ -79,29 +130,25 @@ export function SessionProvider({ children }) {
     setTrips([]);
   }, []);
 
-  const updateProfile = useCallback(
-    ({ name, email }) => {
-      const users = read(KEYS.users, {});
-      const nextEmail = normalise(email);
-      if (nextEmail !== user.email && users[nextEmail]) {
-        throw new Error("Another account uses this email. Enter a different one.");
-      }
-      const account = { ...user, name: name.trim(), email: nextEmail };
-      const { [user.email]: _old, ...rest } = users;
-      write(KEYS.users, { ...rest, [nextEmail]: account });
-      if (nextEmail !== user.email) {
-        write(KEYS.trips(nextEmail), read(KEYS.trips(user.email), []));
-        write(KEYS.trips(user.email), undefined);
-      }
-      write(KEYS.session, nextEmail);
+  const updateName = useCallback(
+    async (name) => {
+      const { user: account } = await authApi.updateName({ email: user.email, name });
       setUser(account);
     },
     [user],
   );
 
-  const deleteAccount = useCallback(() => {
-    const { [user.email]: _gone, ...rest } = read(KEYS.users, {});
-    write(KEYS.users, rest);
+  /** Step 2 of an email change: the code sent to the new address. Moves saved trips across. */
+  const confirmEmailChange = useCallback(async (values) => {
+    const { user: account, previousEmail } = await authApi.confirmEmailChange(values);
+    write(KEYS.trips(account.email), read(KEYS.trips(previousEmail), []));
+    write(KEYS.trips(previousEmail), undefined);
+    write(KEYS.session, account.email);
+    setUser(account);
+  }, []);
+
+  const deleteAccount = useCallback(async () => {
+    await authApi.deleteAccount({ email: user.email });
     write(KEYS.trips(user.email), undefined);
     logOut();
   }, [user, logOut]);
@@ -144,19 +191,44 @@ export function SessionProvider({ children }) {
       user,
       trips,
       authModal,
-      openAuth: setAuthModal,
-      closeAuth: () => setAuthModal(null),
+      openAuth,
+      goToStep,
+      closeAuth,
+      finishAuth,
       signUp,
       logIn,
+      verifyEmail,
+      resetPassword,
       logOut,
-      updateProfile,
+      updateName,
+      confirmEmailChange,
       deleteAccount,
       saveTrip,
       updateTrip,
       deleteTrip,
       exportData,
     }),
-    [user, trips, authModal, signUp, logIn, logOut, updateProfile, deleteAccount, saveTrip, updateTrip, deleteTrip, exportData],
+    [
+      user,
+      trips,
+      authModal,
+      openAuth,
+      goToStep,
+      closeAuth,
+      finishAuth,
+      signUp,
+      logIn,
+      verifyEmail,
+      resetPassword,
+      logOut,
+      updateName,
+      confirmEmailChange,
+      deleteAccount,
+      saveTrip,
+      updateTrip,
+      deleteTrip,
+      exportData,
+    ],
   );
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>;

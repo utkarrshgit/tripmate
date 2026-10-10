@@ -54,7 +54,7 @@ export default function DataControls() {
         />
         <DataRow
           title="Log out"
-          body="You can log back in with your email."
+          body="You can log back in with your email and password."
           action={
             <Button
               icon="logout"
@@ -90,8 +90,8 @@ export default function DataControls() {
                 <Button onClick={close}>Cancel</Button>
                 <Button
                   variant="primary"
-                  onClick={() => {
-                    deleteAccount();
+                  onClick={async () => {
+                    await deleteAccount();
                     navigate("/", { replace: true });
                   }}
                 >

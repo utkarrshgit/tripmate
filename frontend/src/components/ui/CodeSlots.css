@@ -1,0 +1,185 @@
+/*
+ * CodeSlots — adapted from React Bits. DESIGN.md: hairline slots like text inputs,
+ * a light fill as each digit lands, the input focus ring on the active slot, error
+ * colour only on error, a success-pale wash with a check on success, no hover rules.
+ */
+.code-slots {
+  --cs-gap: 8px;
+  --cs-max: 52px;
+  --cs-settle: 300ms;
+  --cs-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  position: relative;
+  width: 100%;
+}
+
+.code-slots__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cs-count), minmax(0, var(--cs-max)));
+  gap: var(--cs-gap);
+  width: fit-content;
+  max-width: 100%;
+  cursor: text;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.code-slots[data-disabled] .code-slots__row {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* The real input covers the row, invisible; the slots below are its picture */
+.code-slots__input {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: transparent;
+  caret-color: transparent;
+  font-size: 16px; /* keeps iOS from zooming on focus */
+  opacity: 0;
+  cursor: inherit;
+  appearance: none;
+}
+
+.code-slots__slot {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 5 / 6;
+  overflow: hidden;
+  border: 1px solid var(--color-ash);
+  border-radius: var(--rounded-md);
+  background: var(--color-canvas);
+  user-select: none;
+  transition: border-color var(--motion-fast) var(--motion-ease);
+}
+/* Active slot while focused: the same ring as a focused text input */
+.code-slots__slot[data-active] {
+  border: 2px solid var(--color-ink);
+  outline: 4px solid var(--color-focus-outer);
+  outline-offset: 0;
+}
+
+.code-slots__fill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-secondary-bg);
+  transform: scale(0);
+  transition: transform var(--cs-settle) var(--motion-ease-in) var(--cs-delay, 0ms);
+}
+.code-slots__slot[data-filled] .code-slots__fill {
+  transform: scale(1);
+  transition-timing-function: var(--cs-spring);
+}
+
+.code-slots__digit {
+  position: relative;
+  z-index: 1;
+  color: var(--color-ink);
+  font-size: clamp(20px, 6vw, 26px);
+  font-weight: 600;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translateY(var(--motion-rise));
+  transition:
+    opacity var(--cs-settle) var(--motion-ease) var(--cs-delay, 0ms),
+    transform var(--cs-settle) var(--cs-spring) var(--cs-delay, 0ms);
+}
+.code-slots__slot[data-filled] .code-slots__digit {
+  opacity: 1;
+  transform: none;
+}
+
+.code-slots__caret {
+  position: absolute;
+  z-index: 2;
+  top: 28%;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 44%;
+  border-radius: 1px;
+  background: var(--color-ink);
+  animation: code-slots-blink 1s steps(1) infinite;
+}
+@keyframes code-slots-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Error: red edges and fills while the digits drain away */
+.code-slots[data-status="error"] .code-slots__slot {
+  border-color: var(--color-error);
+}
+.code-slots[data-status="error"] .code-slots__fill {
+  background: color-mix(in srgb, var(--color-error) 14%, var(--color-canvas));
+}
+
+/* Success: one pale-green wash opens from the middle across the row, then the check */
+.code-slots__wash {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  border-radius: var(--rounded-md);
+  background: var(--color-success-pale);
+  color: var(--color-success-deep);
+  pointer-events: none;
+  clip-path: inset(0 50% round var(--rounded-md));
+  transition: clip-path var(--cs-settle) var(--motion-ease);
+}
+.code-slots[data-status="success"] .code-slots__wash {
+  clip-path: inset(0 0 round var(--rounded-md));
+}
+.code-slots__check {
+  opacity: 0;
+  transform: translateY(var(--motion-rise)) scale(0.85);
+  transition:
+    opacity 200ms var(--motion-ease) 260ms,
+    transform 350ms var(--cs-spring) 260ms;
+}
+.code-slots[data-status="success"] .code-slots__check {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 380px) {
+  .code-slots {
+    --cs-gap: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code-slots__fill,
+  .code-slots__digit,
+  .code-slots__check {
+    transform: none !important;
+    transition-property: opacity;
+  }
+  .code-slots__fill {
+    opacity: 0;
+  }
+  .code-slots__slot[data-filled] .code-slots__fill {
+    opacity: 1;
+  }
+  .code-slots__wash {
+    clip-path: none;
+    opacity: 0;
+    transition: opacity 200ms ease;
+  }
+  .code-slots[data-status="success"] .code-slots__wash {
+    opacity: 1;
+  }
+  .code-slots__caret {
+    animation: none;
+  }
+}

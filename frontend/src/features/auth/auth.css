@@ -12,3 +12,58 @@
   margin-top: var(--spacing-xl);
   text-align: center;
 }
+.auth-forgot {
+  justify-self: start;
+}
+
+/* Password input with the show/hide toggle inside its right edge */
+.password-input {
+  position: relative;
+}
+.password-input .input {
+  padding-right: 52px;
+}
+.password-input .input:focus,
+.password-input .input:focus-visible {
+  padding-right: 51px;
+}
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: var(--rounded-full);
+  background: transparent;
+  color: var(--color-mute);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.password-toggle:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+/* Code step */
+.code-dev-notice .code-dev-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: var(--color-ink);
+}
+.code-success {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-success-deep);
+}
+.code-step-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--spacing-sm) var(--spacing-lg);
+}
