@@ -3,6 +3,7 @@ export { default as BranchedMenu } from "./BranchedMenu";
 export { default as Button, IconButton } from "./Button";
 export { default as Calendar } from "./Calendar";
 export { default as Chip, ChipStrip } from "./Chip";
+export { default as CodeSlots } from "./CodeSlots";
 export { Avatar, Notice, StatusPill } from "./Feedback";
 export { default as FeatureRow } from "./FeatureRow";
 export { default as HeroCtaStrip } from "./HeroCtaStrip";

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { Button, SystemPage } from "@/components/ui";
 import { SignedOutPrompt } from "@/features/auth";
@@ -10,9 +10,17 @@ import { recallPlan, useSession } from "@/state/session";
 function SaveNewTrip({ plan, query, pricing }) {
   const { user, openAuth, saveTrip } = useSession();
   const [saved, setSaved] = useState(null);
+  // Signing up from "Sign up to save" saves the trip as soon as the account is ready.
+  const [saveAfterSignIn, setSaveAfterSignIn] = useState(false);
+  useEffect(() => {
+    // Waits for the prices too, since this button saves the trip with them.
+    if (!saveAfterSignIn || !user || !pricing) return;
+    setSaveAfterSignIn(false);
+    setSaved(saveTrip(plan, query, pricing));
+  }, [saveAfterSignIn, user, saveTrip, plan, query, pricing]);
   if (!user) {
     return (
-      <Button icon="bookmark" onClick={() => openAuth("signup")}>
+      <Button icon="bookmark" onClick={() => openAuth("signup", { then: () => setSaveAfterSignIn(true) })}>
         Sign up to save
       </Button>
     );

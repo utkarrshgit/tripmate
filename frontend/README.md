@@ -68,7 +68,8 @@ Import from `src` with the `@/` alias, e.g. `import { Button } from "@/component
 | Change how dates are read from text | `features/planner/dateParsing.js`: pure functions; add a rule to `RULES`. |
 | Add a destination or interest | `data/catalog.js`. Interests must match the backend parser's keywords. |
 | Show AI activity somewhere new | Use `<ThoughtLine>` from `@/components/ui`: `working` while it runs, `steps` for the trace, `doneLabel` for the settled sentence. Planner step wording (`doing`, `did`) lives in `PLANNERS` in `data/catalog.js`. |
-| Hook up real auth / saved trips | Replace the localStorage functions in `state/session.jsx`; components only use `useSession()`. |
+| Hook up real auth | Replace each function in `state/authApi.js` with a call to its endpoint (each is named after one). They already follow the planned rules: 6-digit email codes for sign-up, password reset and email changes, valid 10 minutes, 5 tries, a new code after 60 seconds. Drop `devCode`, which only exists because there's no email yet. |
+| Hook up saved trips | Replace the localStorage trip functions in `state/session.jsx`; components only use `useSession()`. |
 
 ## Design and motion rules
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button, SystemPage } from "@/components/ui";
 import { TripPlanView } from "@/features/trips";
@@ -11,6 +11,13 @@ import { recallPlan, useSession } from "@/state/session";
 function TripActions({ plan, query }) {
   const { user, openAuth, saveTrip } = useSession();
   const [saved, setSaved] = useState(null);
+  // Signing up from "Sign up to save" saves the trip as soon as the account is ready.
+  const [saveAfterSignIn, setSaveAfterSignIn] = useState(false);
+  useEffect(() => {
+    if (!saveAfterSignIn || !user) return;
+    setSaveAfterSignIn(false);
+    setSaved(saveTrip(plan, query));
+  }, [saveAfterSignIn, user, saveTrip, plan, query]);
 
   const exact = (
     <Button as={Link} to="/trip/prices" state={{ plan, query }} variant={user ? "primary" : "secondary"} icon="wallet">
@@ -20,7 +27,7 @@ function TripActions({ plan, query }) {
   let save;
   if (!user) {
     save = (
-      <Button icon="bookmark" onClick={() => openAuth("signup")}>
+      <Button icon="bookmark" onClick={() => openAuth("signup", { then: () => setSaveAfterSignIn(true) })}>
         Sign up to save
       </Button>
     );

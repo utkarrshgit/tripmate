@@ -12,9 +12,10 @@ const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabi
  * modal-card over a 50% scrim (a bottom sheet on mobile). Traps focus, closes on
  * Escape or a scrim click, and plays an exit animation before calling onClose.
  * `children` may be a function: ({ close }) => …, so inner buttons can close
- * with the same animation.
+ * with the same animation. Without a `title`, pass `labelledBy`: the id of the
+ * heading inside that names the dialog.
  */
-export default function Modal({ title, onClose, children }) {
+export default function Modal({ title, labelledBy, onClose, children }) {
   const titleId = useId();
   const cardRef = useRef(null);
   const onCloseRef = useRef(onClose);
@@ -68,7 +69,7 @@ export default function Modal({ title, onClose, children }) {
         className="modal-card"
         role="dialog"
         aria-modal="true"
-        aria-labelledby={title ? titleId : undefined}
+        aria-labelledby={title ? titleId : labelledBy}
       >
         <IconButton icon="close" label="Close" className="modal-close" onClick={close} />
         {title && (
