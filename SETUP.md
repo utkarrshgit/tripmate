@@ -187,6 +187,8 @@ Sign-up, log-in and password reset use 6-digit codes sent by email. With the def
 python -m app.cli create-admin
 ```
 
+Admins see **AI activity** in the account menu: every planning run and model call, with success rates and timings.
+
 ## Local AI models (Ollama)
 
 TripMate uses three local models through [Ollama](https://ollama.com):

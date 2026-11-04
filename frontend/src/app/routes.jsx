@@ -19,6 +19,7 @@ export const ROUTES = [
   { path: "/trips/:id/prices", page: lazy(() => import("@/pages/ExactPrices")), skeleton: FormSkeleton },
   { path: "/account", page: lazy(() => import("@/pages/Account")), skeleton: FormSkeleton },
   { path: "/shared/:token", page: lazy(() => import("@/pages/SharedTrip")), skeleton: TripSkeleton },
+  { path: "/admin/ai", page: lazy(() => import("@/pages/AiActivity")), skeleton: GridSkeleton },
   { path: "/privacy", page: lazy(() => import("@/pages/Privacy")), skeleton: ArticleSkeleton },
   { path: "/terms", page: lazy(() => import("@/pages/Terms")), skeleton: ArticleSkeleton },
   { path: "/unavailable", page: lazy(() => import("@/pages/ServiceUnavailable")), skeleton: MessageSkeleton },

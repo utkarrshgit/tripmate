@@ -3,6 +3,8 @@ import "./trips.css";
 export { default as ConfirmDeleteTrip } from "./ConfirmDeleteTrip";
 export { default as ItineraryEditor } from "./ItineraryEditor";
 export { RenameTripModal, ShareTripModal } from "./TripModals";
+export { default as ReviseBox } from "./ReviseBox";
+export { default as SimilarPlaces } from "./SimilarPlaces";
 export { default as VersionHistory } from "./VersionHistory";
 export { default as TripCard } from "./TripCard";
 export { default as TripPlanView } from "./TripPlanView";

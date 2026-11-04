@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { GridSkeleton } from "@/app/PageSkeletons";
-import { Button, FeatureRow, Masonry, Notice, Section } from "@/components/ui";
+import { Button, FeatureRow, Masonry, Notice, SearchBar, Section } from "@/components/ui";
 import { SignedOutPrompt } from "@/features/auth";
 import { ConfirmDeleteTrip, TripCard, tripName } from "@/features/trips";
 import { useSession } from "@/state/session";
-import { deleteTripForever, listTrash, restoreTrip } from "@/state/tripsApi";
+import { deleteTripForever, listTrash, restoreTrip, searchTrips } from "@/state/tripsApi";
 import { formatDate, plural } from "@/utils/format";
 
 const RATIOS = ["3 / 4", "4 / 5", "2 / 3", "1 / 1"];
@@ -75,10 +75,53 @@ function RecentlyDeleted() {
   );
 }
 
+/** Search your trips by meaning ("quiet beach trip"), with the local embedding model. */
+function TripSearch({ onResults }) {
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
+
+  async function submit(value) {
+    const text = value.trim();
+    if (!text) return onResults(null);
+    setBusy(true);
+    setError(null);
+    try {
+      onResults({ q: text, ...(await searchTrips(text)) });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="stack-sm trip-search no-print">
+      <SearchBar
+        label="Search your trips"
+        placeholder="Search your trips, like “quiet beach trip”"
+        value={q}
+        onChange={(value) => {
+          setQ(value);
+          if (!value) onResults(null);
+        }}
+        onSubmit={submit}
+        submitLabel={busy ? "Searching" : "Search"}
+      />
+      {error && (
+        <p className="field-error swap-in" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function MyTrips() {
   const { user, trips, tripsLoaded, imported, dismissImported, deleteTrip } = useSession();
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
+  const [search, setSearch] = useState(null); // { q, mode, results } while searching
 
   if (!user) {
     return <SignedOutPrompt title="Your trips" body="Log in to view your saved trips." />;
@@ -122,11 +165,20 @@ export default function MyTrips() {
             }
           />
         ) : (
-          <Masonry>
-            {trips.map((trip, i) => (
-              <TripCard key={trip.id} trip={trip} ratio={RATIOS[i % RATIOS.length]} onDelete={setPendingDelete} />
-            ))}
-          </Masonry>
+          <div className="stack-lg">
+            {trips.length > 1 && <TripSearch onResults={setSearch} />}
+            {search && (
+              <p className="t-body-sm c-mute" role="status">
+                {search.results.length ? plural(search.results.length, "trip") : "No trips"} for “{search.q}”
+                {search.mode === "meaning" ? ", best matches first. Searched by meaning with a local AI model." : ". Searched by words: the local AI model isn't running."}
+              </p>
+            )}
+            <Masonry key={search?.q ?? "all"}>
+              {(search ? search.results : trips).map((trip, i) => (
+                <TripCard key={trip.id} trip={trip} ratio={RATIOS[i % RATIOS.length]} onDelete={setPendingDelete} />
+              ))}
+            </Masonry>
+          </div>
         )}
       </Section>
       <RecentlyDeleted key={trips.length} />

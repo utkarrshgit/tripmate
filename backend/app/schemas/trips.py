@@ -118,6 +118,8 @@ class TripOut(TripSummary):
     items: list[ItemOut]
     pricing: dict | None
     versions: list[VersionSummary]
+    # For a version made by "change it in words": {"changes": ["Day 2 afternoon: Hawa Mahal → free time", ...]}.
+    revision: dict | None = None
 
 
 class ShareOut(BaseModel):
@@ -134,3 +136,7 @@ class SharedTripOut(BaseModel):
     plan: dict
     shared_by: str
     saved_at: datetime
+
+
+class ReviseIn(BaseModel):
+    instruction: str = Field(min_length=1, max_length=500)

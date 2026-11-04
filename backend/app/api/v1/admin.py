@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import DB, admin
 from app.schemas.accounts import AdminUserOut, AdminUserPage, AdminUserPatch
-from app.services import admin_service
+from app.services import admin_service, ai_activity
 
 router = APIRouter(prefix="/admin/users", tags=["admin"], dependencies=[Depends(admin)])
 
@@ -39,3 +39,12 @@ async def update_user(user_id: uuid.UUID, body: AdminUserPatch, db: AsyncSession
 async def delete_user(user_id: uuid.UUID, db: AsyncSession = DB):
     await admin_service.delete_user(db, user_id)
     return Response(status_code=204)
+
+
+ai = APIRouter(prefix="/admin", tags=["admin"], dependencies=[Depends(admin)])
+
+
+@ai.get("/ai-activity")
+async def model_activity(days: int = Query(7, ge=1, le=90), db: AsyncSession = DB):
+    """How the local models performed: calls, success rate, typical and slowest times, tokens, recent runs."""
+    return await ai_activity.ai_activity(db, days)
