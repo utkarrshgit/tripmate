@@ -1,60 +1,66 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button, SystemPage } from "@/components/ui";
-import { TripPlanView } from "@/features/trips";
+import { TripPlanView, useTripSaver } from "@/features/trips";
 import { recallPlan, useSession } from "@/state/session";
 
 /**
  * The results page's next steps. Exact prices are the main one; saving comes second.
  * Logged out, the nav's red Sign up is the fold's one red CTA, so nothing here is red.
+ * After a saved trip's Plan again (`forTrip`), saving adds a new version to that trip.
  */
-function TripActions({ plan, query }) {
-  const { user, openAuth, saveTrip } = useSession();
-  const [saved, setSaved] = useState(null);
+function TripActions({ plan, query, forTrip }) {
+  const { user, openAuth } = useSession();
+  const { saved, busy, error, save } = useTripSaver(forTrip);
   // Signing up from "Sign up to save" saves the trip as soon as the account is ready.
   const [saveAfterSignIn, setSaveAfterSignIn] = useState(false);
   useEffect(() => {
     if (!saveAfterSignIn || !user) return;
     setSaveAfterSignIn(false);
-    setSaved(saveTrip(plan, query));
-  }, [saveAfterSignIn, user, saveTrip, plan, query]);
+    save(plan, query);
+  }, [saveAfterSignIn, user, plan, query]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const exact = (
-    <Button as={Link} to="/trip/prices" state={{ plan, query }} variant={user ? "primary" : "secondary"} icon="wallet">
+    <Button as={Link} to="/trip/prices" state={{ plan, query, forTrip }} variant={user ? "primary" : "secondary"} icon="wallet">
       Get exact prices
     </Button>
   );
-  let save;
+  let action;
   if (!user) {
-    save = (
+    action = (
       <Button icon="bookmark" onClick={() => openAuth("signup", { then: () => setSaveAfterSignIn(true) })}>
         Sign up to save
       </Button>
     );
   } else if (saved) {
-    save = (
+    action = (
       <Button as={Link} to={`/trips/${saved.id}`} icon="check" className="swap-in">
-        View saved trip
+        {forTrip ? "View updated trip" : "View saved trip"}
       </Button>
     );
   } else {
-    save = (
-      <Button icon="bookmark" onClick={() => setSaved(saveTrip(plan, query))}>
-        Save trip
+    action = (
+      <Button icon="bookmark" disabled={busy} onClick={() => save(plan, query)}>
+        {busy ? "Saving…" : forTrip ? `Save as a new version of ${forTrip.title}` : "Save trip"}
       </Button>
     );
   }
   return (
     <>
       {exact}
-      {save}
+      {action}
+      {error && (
+        <p className="field-error swap-in" role="alert">
+          {error}
+        </p>
+      )}
     </>
   );
 }
 
 export default function TripResult() {
   const location = useLocation();
-  const { plan, query } = location.state ?? recallPlan() ?? {};
+  const { plan, query, forTrip = null } = location.state ?? recallPlan() ?? {};
 
   if (!plan) {
     return (
@@ -74,7 +80,7 @@ export default function TripResult() {
 
   return (
     <div className="container section">
-      <TripPlanView plan={plan} query={query} primaryAction={<TripActions plan={plan} query={query} />} />
+      <TripPlanView plan={plan} query={query} primaryAction={<TripActions plan={plan} query={query} forTrip={forTrip} />} />
     </div>
   );
 }

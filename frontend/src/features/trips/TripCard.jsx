@@ -24,7 +24,12 @@ export default function TripCard({ trip, ratio, onDelete }) {
             label={`Plan ${tripPhrase(plan)} again`}
             onClick={() =>
               navigate("/plan", {
-                state: { query: trip.query, run: true, dates: plan.start_date ? { start: plan.start_date, end: plan.end_date } : null },
+                state: {
+                  query: trip.query,
+                  run: true,
+                  dates: plan.start_date ? { start: plan.start_date, end: plan.end_date } : null,
+                  forTrip: { id: trip.id, title: trip.title || tripName(plan) },
+                },
               })
             }
           />

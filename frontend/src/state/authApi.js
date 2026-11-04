@@ -32,7 +32,8 @@ const sent = (body) => ({ email: body.email, purpose: body.purpose, resendAt: to
 /** The account as the rest of the app sees it. */
 const user = (u) => ({ id: u.id, name: u.name, email: u.email, role: u.role, createdAt: u.created_at, verifiedAt: u.email_verified_at });
 
-async function call(method, path, body) {
+/** One request to /api/v1 with the session cookie. Throws AuthError with the API's message. Shared by tripsApi.js. */
+export async function call(method, path, body) {
   let res;
   try {
     res = await fetch(`${API_URL}/api/v1${path}`, {

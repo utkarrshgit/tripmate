@@ -70,6 +70,8 @@ export const PAGES = [
   { path: "/trips/:id", title: "Saved trip", index: false },
   { path: "/trips/:id/prices", title: "Exact prices", index: false },
   { path: "/account", title: "Account", index: false },
+  // A private link to someone's trip: never in search results.
+  { path: "/shared/:token", title: "Shared trip", index: false },
   { path: "/unavailable", title: "Service unavailable", index: false },
   { path: "*", title: "Page not found", index: false },
 ];

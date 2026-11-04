@@ -1,23 +1,102 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, FeatureRow, Masonry, Section } from "@/components/ui";
+import { GridSkeleton } from "@/app/PageSkeletons";
+import { Button, FeatureRow, Masonry, Notice, Section } from "@/components/ui";
 import { SignedOutPrompt } from "@/features/auth";
-import { ConfirmDeleteTrip, TripCard } from "@/features/trips";
+import { ConfirmDeleteTrip, TripCard, tripName } from "@/features/trips";
 import { useSession } from "@/state/session";
-import { plural } from "@/utils/format";
+import { deleteTripForever, listTrash, restoreTrip } from "@/state/tripsApi";
+import { formatDate, plural } from "@/utils/format";
 
 const RATIOS = ["3 / 4", "4 / 5", "2 / 3", "1 / 1"];
 
+/** Trips deleted in the last 30 days: restore one, or delete it for good. Loads when opened. */
+function RecentlyDeleted() {
+  const { tripChanged } = useSession();
+  const [trash, setTrash] = useState(null);
+  const [error, setError] = useState(null);
+
+  async function load() {
+    setError(null);
+    try {
+      setTrash((await listTrash()).trips);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function act(fn, id) {
+    setError(null);
+    try {
+      const result = await fn(id);
+      if (result?.id) tripChanged(result); // restored: back in the list
+      setTrash((list) => list.filter((t) => t.id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  return (
+    <Section title="Recently deleted" as="h2" headingClass="t-heading-lg" intro="Deleted trips stay here for 30 days." className="no-print">
+      {trash === null ? (
+        <div>
+          <Button icon="trash" onClick={load}>
+            Show deleted trips
+          </Button>
+        </div>
+      ) : trash.length === 0 ? (
+        <p className="t-body-md c-mute">Nothing deleted in the last 30 days.</p>
+      ) : (
+        <ul className="divided account-rows">
+          {trash.map((t) => (
+            <li key={t.id} className="account-row">
+              <div>
+                <p className="t-body-strong c-ink">{t.title || tripName(t.plan)}</p>
+                <p className="t-body-sm c-mute">Deleted {formatDate(t.deletedAt)}</p>
+              </div>
+              <span className="row">
+                <Button icon="refresh" onClick={() => act(restoreTrip, t.id)}>
+                  Restore
+                </Button>
+                <Button variant="tertiary" onClick={() => act(deleteTripForever, t.id)}>
+                  Delete forever
+                </Button>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {error && (
+        <p className="field-error swap-in" role="alert">
+          {error}
+        </p>
+      )}
+    </Section>
+  );
+}
+
 export default function MyTrips() {
-  const { user, trips, deleteTrip } = useSession();
+  const { user, trips, tripsLoaded, imported, dismissImported, deleteTrip } = useSession();
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [deleteError, setDeleteError] = useState(null);
 
   if (!user) {
     return <SignedOutPrompt title="Your trips" body="Log in to view your saved trips." />;
   }
+  if (!tripsLoaded) return <GridSkeleton />;
 
   return (
     <div className="container">
+      {imported > 0 && (
+        <Notice icon="check" tone="success" className="trips-imported">
+          <p className="t-body-sm">
+            We moved {plural(imported, "trip")} saved in this browser into your account, so you'll see {imported === 1 ? "it" : "them"} on any device.{" "}
+            <button type="button" className="link-inline link-button" onClick={dismissImported}>
+              OK
+            </button>
+          </p>
+        </Notice>
+      )}
       <Section
         title="Your trips"
         as="h1"
@@ -50,14 +129,20 @@ export default function MyTrips() {
           </Masonry>
         )}
       </Section>
+      <RecentlyDeleted key={trips.length} />
 
       {pendingDelete && (
         <ConfirmDeleteTrip
           trip={pendingDelete}
-          onCancel={() => setPendingDelete(null)}
-          onConfirm={() => {
-            deleteTrip(pendingDelete.id);
-            setPendingDelete(null);
+          error={deleteError}
+          onCancel={() => (setPendingDelete(null), setDeleteError(null))}
+          onConfirm={async () => {
+            try {
+              await deleteTrip(pendingDelete.id);
+              setPendingDelete(null);
+            } catch (err) {
+              setDeleteError(err.message);
+            }
           }}
         />
       )}

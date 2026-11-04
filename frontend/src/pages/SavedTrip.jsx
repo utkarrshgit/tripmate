@@ -1,24 +1,47 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { TripSkeleton } from "@/app/PageSkeletons";
 import { Button, Icon, Notice } from "@/components/ui";
 import { SignedOutPrompt } from "@/features/auth";
 import { NotFoundView } from "@/features/system";
-import { ConfirmDeleteTrip, TripPlanView } from "@/features/trips";
+import { ConfirmDeleteTrip, ItineraryEditor, RenameTripModal, ShareTripModal, TripPlanView, VersionHistory, useTrip } from "@/features/trips";
 import { useSession } from "@/state/session";
 import { formatDate, rupees } from "@/utils/format";
 
 export default function SavedTrip() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, trips, deleteTrip } = useSession();
-  const [confirming, setConfirming] = useState(false);
+  const { user, deleteTrip } = useSession();
+  const { trip, status, error, update } = useTrip(id);
+  const [open, setOpen] = useState(null); // null | "delete" | "rename" | "share" | "edit"
+  const [deleteError, setDeleteError] = useState(null);
 
   if (!user) {
     return <SignedOutPrompt title="Log in to see this trip" body="Saved trips are only visible to the account that saved them." />;
   }
+  if (status === "loading") return <TripSkeleton />;
+  if (status === "missing") return <NotFoundView />;
+  if (status === "error") {
+    return (
+      <div className="container section">
+        <Notice tone="error" icon="alert">
+          <p className="t-body-sm">{error}</p>
+        </Notice>
+      </div>
+    );
+  }
 
-  const trip = trips.find((t) => t.id === id);
-  if (!trip) return <NotFoundView />;
+  const planAgain = () =>
+    navigate("/plan", {
+      state: {
+        query: trip.query,
+        run: true,
+        dates: trip.plan.start_date ? { start: trip.plan.start_date, end: trip.plan.end_date } : null,
+        forTrip: { id: trip.id, title: trip.title },
+      },
+    });
+
+  const version = trip.versions.length > 1 ? ` · Version ${trip.version.no}` : "";
 
   return (
     <div className="container section">
@@ -39,41 +62,51 @@ export default function SavedTrip() {
       <TripPlanView
         plan={trip.plan}
         query={trip.query}
-        eyebrow={`Saved on ${formatDate(trip.savedAt)}`}
+        eyebrow={`${trip.title} · Saved on ${formatDate(trip.savedAt)}${version}`}
         primaryAction={
           <>
             <Button as={Link} to={`/trips/${trip.id}/prices`} variant="primary" icon="wallet">
               {trip.pricing ? "View exact prices" : "Get exact prices"}
             </Button>
-            <Button
-              icon="refresh"
-              onClick={() =>
-                navigate("/plan", {
-                  state: {
-                    query: trip.query,
-                    run: true,
-                    dates: trip.plan.start_date ? { start: trip.plan.start_date, end: trip.plan.end_date } : null,
-                  },
-                })
-              }
-            >
+            <Button icon="refresh" onClick={planAgain}>
               Plan again
+            </Button>
+            <Button icon="edit" onClick={() => setOpen("edit")}>
+              Edit days
+            </Button>
+            <Button icon="copy" onClick={() => setOpen("share")}>
+              Share
             </Button>
           </>
         }
         extraActions={
-          <Button variant="tertiary" icon="trash" onClick={() => setConfirming(true)}>
-            Delete trip
-          </Button>
+          <>
+            <Button variant="tertiary" icon="edit" onClick={() => setOpen("rename")}>
+              Rename
+            </Button>
+            <Button variant="tertiary" icon="trash" onClick={() => setOpen("delete")}>
+              Delete trip
+            </Button>
+          </>
         }
       />
-      {confirming && (
+      <VersionHistory trip={trip} onRestored={update} />
+
+      {open === "edit" && <ItineraryEditor trip={trip} onChange={update} onClose={() => setOpen(null)} />}
+      {open === "share" && <ShareTripModal trip={trip} onClose={() => setOpen(null)} />}
+      {open === "rename" && <RenameTripModal trip={trip} onRenamed={update} onClose={() => setOpen(null)} />}
+      {open === "delete" && (
         <ConfirmDeleteTrip
           trip={trip}
-          onCancel={() => setConfirming(false)}
-          onConfirm={() => {
-            deleteTrip(trip.id);
-            navigate("/trips", { replace: true });
+          error={deleteError}
+          onCancel={() => setOpen(null)}
+          onConfirm={async () => {
+            try {
+              await deleteTrip(trip.id);
+              navigate("/trips", { replace: true });
+            } catch (err) {
+              setDeleteError(err.message);
+            }
           }}
         />
       )}

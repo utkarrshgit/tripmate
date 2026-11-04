@@ -1,16 +1,16 @@
 /*
  * The signed-in account, the sign-up window, and saved trips.
  *
- * Accounts go through ./authApi.js and the API; the session itself is an HttpOnly cookie.
- * Saved trips are still TEMPORARY LOCAL STAND-INS in localStorage, keyed by email, until the
- * trip endpoints exist (step 3). Components only use the context below.
+ * Accounts go through ./authApi.js and trips through ./tripsApi.js; the session itself is
+ * an HttpOnly cookie. `trips` is the signed-in account's list (card fields only); a page
+ * that shows one trip loads it with getTrip. Components only use the context below.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as authApi from "./authApi";
+import * as tripsApi from "./tripsApi";
 
-const KEYS = {
-  trips: (email) => `tripmate:trips:${email}`,
-};
+// Where trips lived before accounts moved to the API. Moved into the account once, then cleared.
+const LEGACY_TRIPS_KEY = (email) => `tripmate:trips:${email}`;
 // The email waiting for a code, kept for this tab so a refresh reopens the code step.
 const PENDING_KEY = "tripmate:pendingCode";
 
@@ -54,6 +54,29 @@ const SessionContext = createContext(null);
 export function SessionProvider({ children }) {
   const [user, setUser] = useState(null);
   const [trips, setTrips] = useState([]);
+  const [tripsLoaded, setTripsLoaded] = useState(false);
+  // How many browser-saved trips were just moved into the account, for a one-time notice.
+  const [imported, setImported] = useState(0);
+
+  /** Loads the account's trips, first moving in any this browser saved before accounts used the API. */
+  const loadTrips = useCallback(async (account) => {
+    const legacy = read(LEGACY_TRIPS_KEY(account.email), []);
+    if (legacy.length) {
+      try {
+        const { imported: count } = await tripsApi.importTrips(legacy);
+        write(LEGACY_TRIPS_KEY(account.email), undefined);
+        setImported(count);
+      } catch {
+        // Keep them in the browser and try again next time.
+      }
+    }
+    try {
+      setTrips((await tripsApi.listTrips()).trips);
+    } catch {
+      setTrips([]);
+    }
+    setTripsLoaded(true);
+  }, []);
   // False until the API has said who's signed in, so pages don't flash "Log in" on a refresh.
   const [ready, setReady] = useState(false);
 
@@ -66,7 +89,7 @@ export function SessionProvider({ children }) {
         if (!live) return;
         if (account) {
           setUser(account);
-          setTrips(read(KEYS.trips(account.email), []));
+          loadTrips(account);
         }
         setReady(true);
       });
@@ -103,7 +126,7 @@ export function SessionProvider({ children }) {
   /** Signs in. The window stays open so it can show success; it calls finishAuth to close. */
   const startSession = useCallback((account) => {
     setUser(account);
-    setTrips(read(KEYS.trips(account.email), []));
+    loadTrips(account);
     writePending(null);
   }, []);
 
@@ -145,6 +168,7 @@ export function SessionProvider({ children }) {
   const signOutLocally = useCallback(() => {
     setUser(null);
     setTrips([]);
+    setTripsLoaded(false);
   }, []);
 
   const logOut = useCallback(async () => {
@@ -170,8 +194,7 @@ export function SessionProvider({ children }) {
     async (values) => {
       const previousEmail = user.email;
       const { user: account } = await authApi.confirmEmailChange(values);
-      write(KEYS.trips(account.email), read(KEYS.trips(previousEmail), []));
-      write(KEYS.trips(previousEmail), undefined);
+      void previousEmail; // trips belong to the account on the server, so nothing moves
       setUser(account);
     },
     [user],
@@ -183,45 +206,35 @@ export function SessionProvider({ children }) {
   const deleteAccount = useCallback(
     async (password) => {
       await authApi.deleteAccount({ password });
-      write(KEYS.trips(user.email), undefined);
       signOutLocally();
     },
     [user, signOutLocally],
   );
 
-  const persistTrips = useCallback(
-    (next) => {
-      write(KEYS.trips(user.email), next);
-      setTrips(next);
-    },
-    [user],
-  );
+  /** Saves a planned trip to the account and returns it. `pricing` is an exact-price check, if one was made. */
+  const saveTrip = useCallback(async (plan, query, pricing = null) => {
+    const trip = await tripsApi.createTrip({ query, plan, pricing });
+    setTrips((list) => [trip, ...list]);
+    return trip;
+  }, []);
 
-  // `pricing` (optional) is an exact-price check: { origin, response, selection, checkedAt }.
-  const saveTrip = useCallback(
-    (plan, query, pricing = null) => {
-      const trip = {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        query,
-        plan,
-        pricing,
-        savedAt: new Date().toISOString(),
-      };
-      persistTrips([trip, ...trips]);
-      return trip;
-    },
-    [trips, persistTrips],
-  );
+  /** Keeps the list in step after a page changes one trip (rename, new version, prices…). */
+  const tripChanged = useCallback((trip) => {
+    setTrips((list) => {
+      const rest = list.filter((t) => t.id !== trip.id);
+      return trip.deletedAt ? rest : [trip, ...rest];
+    });
+  }, []);
 
-  const updateTrip = useCallback(
-    (id, patch) => persistTrips(trips.map((t) => (t.id === id ? { ...t, ...patch } : t))),
-    [trips, persistTrips],
-  );
+  /** Moves a trip to the trash (kept 30 days). */
+  const deleteTrip = useCallback(async (id) => {
+    await tripsApi.trashTrip(id);
+    setTrips((list) => list.filter((t) => t.id !== id));
+  }, []);
 
-  const deleteTrip = useCallback((id) => persistTrips(trips.filter((t) => t.id !== id)), [trips, persistTrips]);
+  const refreshTrips = useCallback(async () => setTrips((await tripsApi.listTrips()).trips), []);
 
-  // The API's export, plus the trips this browser still keeps until step 3 moves them to the API.
-  const exportData = useCallback(async () => ({ ...(await authApi.exportAccount()), trips }), [trips]);
+  const exportData = useCallback(() => authApi.exportAccount(), []);
 
   const value = useMemo(
     () => ({
@@ -243,9 +256,13 @@ export function SessionProvider({ children }) {
       confirmEmailChange,
       changePassword,
       deleteAccount,
+      tripsLoaded,
+      imported,
+      dismissImported: () => setImported(0),
       saveTrip,
-      updateTrip,
+      tripChanged,
       deleteTrip,
+      refreshTrips,
       exportData,
     }),
     [
@@ -267,9 +284,12 @@ export function SessionProvider({ children }) {
       confirmEmailChange,
       changePassword,
       deleteAccount,
+      tripsLoaded,
+      imported,
       saveTrip,
-      updateTrip,
+      tripChanged,
       deleteTrip,
+      refreshTrips,
       exportData,
     ],
   );
