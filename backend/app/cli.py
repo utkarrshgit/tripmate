@@ -2,12 +2,14 @@
 Command-line tasks. From backend/:
 
     python -m app.cli seed-catalog     load or refresh the destinations, interests and places
+    python -m app.cli create-admin     make an admin account, or make an existing account an admin
 
-More commands (create-admin, seed-demo) arrive with the steps that need them.
+seed-demo arrives with the step that needs it.
 """
 
 import argparse
 import asyncio
+import getpass
 
 from app.db.session import SessionLocal, engine
 
@@ -21,7 +23,31 @@ async def _seed_catalog() -> None:
     print(f"Catalog ready: {counts['destinations']} destinations, {counts['interests']} interests, {counts['places']} places.")
 
 
-COMMANDS = {"seed-catalog": _seed_catalog}
+async def _create_admin() -> None:
+    from sqlalchemy import select
+
+    from app.core.security import hash_password, password_problem
+    from app.models import User
+    from app.services.auth_service import check_email, now
+
+    email = check_email(input("Email: "))
+    async with SessionLocal() as session:
+        user = await session.scalar(select(User).where(User.email == email))
+        if user:
+            user.role, user.email_verified_at, user.disabled_at = "admin", user.email_verified_at or now(), None
+            print(f"{email} is now an admin.")
+        else:
+            name = input("Name: ").strip() or "Admin"
+            password = getpass.getpass("Password: ")
+            if problem := password_problem(password, email):
+                raise SystemExit(problem)
+            session.add(User(name=name, email=email, password_hash=hash_password(password), role="admin", email_verified_at=now()))
+            print(f"Admin account created for {email}.")
+        await session.commit()
+    await engine.dispose()
+
+
+COMMANDS = {"seed-catalog": _seed_catalog, "create-admin": _create_admin}
 
 
 def main() -> None:

@@ -1,15 +1,14 @@
 /*
  * The signed-in account, the sign-up window, and saved trips.
  *
- * Accounts and email codes go through ./authApi.js (a local stand-in for the planned
- * auth endpoints). Saved trips are still TEMPORARY LOCAL STAND-INS in localStorage until
- * the trip endpoints exist. Components only use the context below.
+ * Accounts go through ./authApi.js and the API; the session itself is an HttpOnly cookie.
+ * Saved trips are still TEMPORARY LOCAL STAND-INS in localStorage, keyed by email, until the
+ * trip endpoints exist (step 3). Components only use the context below.
  */
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import * as authApi from "./authApi";
 
 const KEYS = {
-  session: "tripmate:session",
   trips: (email) => `tripmate:trips:${email}`,
 };
 // The email waiting for a code, kept for this tab so a refresh reopens the code step.
@@ -53,8 +52,28 @@ function write(key, value) {
 const SessionContext = createContext(null);
 
 export function SessionProvider({ children }) {
-  const [user, setUser] = useState(() => authApi.accountFor(read(KEYS.session, null)));
-  const [trips, setTrips] = useState(() => (user ? read(KEYS.trips(user.email), []) : []));
+  const [user, setUser] = useState(null);
+  const [trips, setTrips] = useState([]);
+  // False until the API has said who's signed in, so pages don't flash "Log in" on a refresh.
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    authApi
+      .fetchMe()
+      .catch(() => null) // API unreachable: treat as signed out; the planner still works
+      .then((account) => {
+        if (!live) return;
+        if (account) {
+          setUser(account);
+          setTrips(read(KEYS.trips(account.email), []));
+        }
+        setReady(true);
+      });
+    return () => {
+      live = false;
+    };
+  }, []);
   // The sign-up window: null when closed, else { step, ...details }. Steps: signup, login,
   // forgot, code ({ email, purpose, resendAt, devCode }), newPassword ({ email, code }).
   const [authModal, setAuthModal] = useState(() => {
@@ -83,7 +102,6 @@ export function SessionProvider({ children }) {
 
   /** Signs in. The window stays open so it can show success; it calls finishAuth to close. */
   const startSession = useCallback((account) => {
-    write(KEYS.session, account.email);
     setUser(account);
     setTrips(read(KEYS.trips(account.email), []));
     writePending(null);
@@ -124,34 +142,52 @@ export function SessionProvider({ children }) {
     [startSession],
   );
 
-  const logOut = useCallback(() => {
-    write(KEYS.session, undefined);
+  const signOutLocally = useCallback(() => {
     setUser(null);
     setTrips([]);
   }, []);
 
-  const updateName = useCallback(
-    async (name) => {
-      const { user: account } = await authApi.updateName({ email: user.email, name });
+  const logOut = useCallback(async () => {
+    try {
+      await authApi.logOut();
+    } finally {
+      signOutLocally(); // even if the API is unreachable, this browser stops showing the account
+    }
+  }, [signOutLocally]);
+
+  const logOutEverywhere = useCallback(async () => {
+    await authApi.logOutEverywhere();
+    signOutLocally();
+  }, [signOutLocally]);
+
+  const updateName = useCallback(async (name) => {
+    const { user: account } = await authApi.updateName({ name });
+    setUser(account);
+  }, []);
+
+  /** Step 2 of an email change: the code sent to the new address. Moves saved trips across. */
+  const confirmEmailChange = useCallback(
+    async (values) => {
+      const previousEmail = user.email;
+      const { user: account } = await authApi.confirmEmailChange(values);
+      write(KEYS.trips(account.email), read(KEYS.trips(previousEmail), []));
+      write(KEYS.trips(previousEmail), undefined);
       setUser(account);
     },
     [user],
   );
 
-  /** Step 2 of an email change: the code sent to the new address. Moves saved trips across. */
-  const confirmEmailChange = useCallback(async (values) => {
-    const { user: account, previousEmail } = await authApi.confirmEmailChange(values);
-    write(KEYS.trips(account.email), read(KEYS.trips(previousEmail), []));
-    write(KEYS.trips(previousEmail), undefined);
-    write(KEYS.session, account.email);
-    setUser(account);
-  }, []);
+  /** Signs out every other device; this one stays signed in. */
+  const changePassword = useCallback(async (values) => authApi.changePassword(values), []);
 
-  const deleteAccount = useCallback(async () => {
-    await authApi.deleteAccount({ email: user.email });
-    write(KEYS.trips(user.email), undefined);
-    logOut();
-  }, [user, logOut]);
+  const deleteAccount = useCallback(
+    async (password) => {
+      await authApi.deleteAccount({ password });
+      write(KEYS.trips(user.email), undefined);
+      signOutLocally();
+    },
+    [user, signOutLocally],
+  );
 
   const persistTrips = useCallback(
     (next) => {
@@ -184,12 +220,14 @@ export function SessionProvider({ children }) {
 
   const deleteTrip = useCallback((id) => persistTrips(trips.filter((t) => t.id !== id)), [trips, persistTrips]);
 
-  const exportData = useCallback(() => ({ account: user, trips, exportedAt: new Date().toISOString() }), [user, trips]);
+  // The API's export, plus the trips this browser still keeps until step 3 moves them to the API.
+  const exportData = useCallback(async () => ({ ...(await authApi.exportAccount()), trips }), [trips]);
 
   const value = useMemo(
     () => ({
       user,
       trips,
+      ready,
       authModal,
       openAuth,
       goToStep,
@@ -200,8 +238,10 @@ export function SessionProvider({ children }) {
       verifyEmail,
       resetPassword,
       logOut,
+      logOutEverywhere,
       updateName,
       confirmEmailChange,
+      changePassword,
       deleteAccount,
       saveTrip,
       updateTrip,
@@ -211,6 +251,7 @@ export function SessionProvider({ children }) {
     [
       user,
       trips,
+      ready,
       authModal,
       openAuth,
       goToStep,
@@ -221,8 +262,10 @@ export function SessionProvider({ children }) {
       verifyEmail,
       resetPassword,
       logOut,
+      logOutEverywhere,
       updateName,
       confirmEmailChange,
+      changePassword,
       deleteAccount,
       saveTrip,
       updateTrip,

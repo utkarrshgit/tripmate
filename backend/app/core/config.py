@@ -16,6 +16,19 @@ class Settings(BaseSettings):
     # Signs email codes so a leaked database can't be used to guess them. Set your own in .env.
     otp_secret: str = "change-me-in-env"
 
+    # Sign-in sessions: a cookie holding a random token; the database keeps only its hash.
+    session_days: int = 30
+    session_cookie: str = "tm_session"
+    cookie_secure: bool = False  # true when served over HTTPS
+
+    # Email: "console" prints messages in the API log; "smtp" sends them (Mailpit: localhost:1025).
+    mail_mode: str = "console"
+    smtp_host: str = "localhost"
+    smtp_port: int = 1025
+    mail_from: str = "TripMate <hello@tripmate.local>"
+    # Development only: API responses include the code that was emailed, so the website can show it.
+    dev_show_codes: bool = False
+
     # Ollama and the three models TripMate uses.
     ollama_base_url: str = "http://localhost:11434"
     ollama_llm_model: str = "gemma4:e2b-mlx"  # writing: requests, itineraries, edits

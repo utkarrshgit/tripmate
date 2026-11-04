@@ -51,7 +51,8 @@ TripMate is an early-stage project. Today:
 | Itinerary, cost breakdown, budget check | ✅ Working, using **estimated** prices |
 | Exact prices step | ✅ Flow works, but uses **sample prices** until real providers are connected |
 | Real flight / hotel / place data | 🔍 Being evaluated ([API research](docs/API_RESEARCH.md)) |
-| Accounts and saved trips | ⚠️ Saved **in the browser only** for now (no server-side accounts yet) |
+| Accounts | ✅ Email and password with a 6-digit email code, sign-in that survives a refresh, password reset, signed-in devices, account deletion, and admin tools |
+| Saved trips | ⚠️ Saved **in the browser only** for now; moving to the server is next |
 | AI language model in the planners | ⚠️ Planners use fixed rules today; a local model (Ollama) is wired in but not used yet |
 | Privacy Policy and Terms | ⚠️ Drafts with placeholders, pending legal review |
 | Photos | ⚠️ Image slots are in place; photos to be added |
@@ -91,7 +92,7 @@ run.sh       One command to set up and start everything
 ## What's next
 
 1. Connect real data for flights, stays and places (choices in [API research](docs/API_RESEARCH.md))
-2. Server-side accounts and saved trips (the database and destination catalog are in place; the account and trip endpoints come next)
+2. Saved trips on the server (accounts are done: sign-up with email codes, sessions, password reset and admin tools; trips come next)
 3. Use the language model inside the planners, with knowledge of each destination
 4. Maps and route planning between activities
 5. A review step that can send a plan back for another pass when something's off

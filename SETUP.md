@@ -163,6 +163,8 @@ The API reads `backend/.env` (created from `.env.example` in step 3):
 | `DATABASE_URL`, `TEST_DATABASE_URL` | The PostgreSQL databases for the app and for tests | `tripmate`, `tripmate_test` on this computer |
 | `CORS_ORIGINS` | The website addresses allowed to call the API with cookies (`./run.sh` sets this for you) | `http://localhost:5173` |
 | `OTP_SECRET` | Signs the 6-digit email codes. Make your own with `python -c "import secrets; print(secrets.token_hex(32))"` | a placeholder |
+| `MAIL_MODE`, `SMTP_HOST`, `SMTP_PORT` | Where sign-up and reset codes go: `console` prints them in the API log; `smtp` sends them, for example to [Mailpit](https://mailpit.axllent.org) on port 1025 | `console` |
+| `DEV_SHOW_CODES` | Development only: shows each emailed code on the website, so you can sign up without an inbox. Never turn this on for real users | `true` |
 | `OLLAMA_BASE_URL` | Where Ollama runs | `http://localhost:11434` |
 | `OLLAMA_LLM_MODEL`, `OLLAMA_DECISION_MODEL`, `OLLAMA_EMBED_MODEL` | The three local models (see below) | `gemma4:e2b-mlx`, `tev1:0.8b`, `qwen3-embedding:0.6b` |
 
@@ -175,6 +177,14 @@ VITE_API_URL=https://your-api.example.com
 In development the website deliberately slows down planning and price checks by a few seconds, so the loading animations can be seen. Production builds don't include this. To turn it off locally, add `VITE_DEMO_DELAYS=false` to `frontend/.env.local`.
 
 Never commit `.env` or `.env.local`. Both are already ignored by git.
+
+## Accounts and admins
+
+Sign-up, log-in and password reset use 6-digit codes sent by email. With the defaults, the code shows on the website and in the API log, so no inbox is needed. To make an admin account (or make an existing account an admin), run this from `backend/`:
+
+```bash
+python -m app.cli create-admin
+```
 
 ## Local AI models (Ollama)
 

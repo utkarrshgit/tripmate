@@ -4,4 +4,4 @@ export { default as AuthModal } from "./AuthModal";
 export { default as CodeStep } from "./CodeStep";
 export { default as PasswordField } from "./PasswordField";
 export { default as SignedOutPrompt } from "./SignedOutPrompt";
-export { validateAccount, validateEmail, validateName, validateNewPassword } from "./validation";
+export { PASSWORD_MIN, validateAccount, validateEmail, validateName, validateNewPassword } from "./validation";
