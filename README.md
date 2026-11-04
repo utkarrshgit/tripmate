@@ -62,8 +62,9 @@ TripMate is an early-stage project. Today:
 |---|---|
 | Website | React 19 and Vite, styled from a Pinterest-inspired design system ([DESIGN.md](DESIGN.md)) |
 | API and planners | Python with FastAPI; one agent class per planner |
+| Database | PostgreSQL 18, through SQLAlchemy 2 (async) with Alembic migrations |
 | AI activity indicator | ThoughtLine, adapted from [React Bits](https://reactbits.dev) |
-| Optional language model | [Ollama](https://ollama.com) (local) |
+| Local AI models | [Ollama](https://ollama.com): `gemma4:e2b-mlx` (general), `tev1:0.8b` (decisions), `qwen3-embedding:0.6b` (search) |
 
 ## What's in this repository
 
@@ -90,7 +91,7 @@ run.sh       One command to set up and start everything
 ## What's next
 
 1. Connect real data for flights, stays and places (choices in [API research](docs/API_RESEARCH.md))
-2. Server-side accounts and saved trips (a database)
+2. Server-side accounts and saved trips (the database and destination catalog are in place; the account and trip endpoints come next)
 3. Use the language model inside the planners, with knowledge of each destination
 4. Maps and route planning between activities
 5. A review step that can send a plan back for another pass when something's off

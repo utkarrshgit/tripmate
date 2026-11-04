@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
+from app.services.health_service import check_health
 from app.schemas.pricing import PriceRequest, PriceResponse
 from app.schemas.trip import TripRequest, TripResponse
 from app.services.pricing_service import PricingService
@@ -13,9 +14,11 @@ app = FastAPI(
     description="Multi-agent AI travel planner.",
 )
 
+# Only the website may call the API with cookies (CORS_ORIGINS in .env; run.sh sets it to the website's port).
+# A wildcard origin can't be used with cookies: browsers refuse to send them.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict this in production.
+    allow_origins=settings.cors_origin_list,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -27,7 +30,8 @@ pricing_service = PricingService()
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": settings.app_name}
+    """Always answers 200 while the API runs; `status` is "degraded" when the database or a model is missing."""
+    return await check_health()
 
 
 @app.post("/api/trips/plan", response_model=TripResponse)
