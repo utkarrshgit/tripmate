@@ -19,10 +19,16 @@ from sqlalchemy.pool import NullPool
 from app.core.config import settings
 from app.db.base import Base
 from app.db.session import get_session
+from app.services import trip_service
 from app.main import app
 from app.services import mail
 
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
+
+# Tests plan with rules only, so they're fast and don't depend on Ollama. Tests that cover the
+# AI paths switch it back on and fake the model (test_ai_planning.py); one optional test uses the
+# real models when RUN_OLLAMA_TESTS=1.
+settings.ai_enabled = False
 
 
 @pytest.fixture(scope="session")
@@ -59,9 +65,11 @@ async def api(db):
             yield session
 
     app.dependency_overrides[get_session] = test_session
+    real_sessions, trip_service.SessionLocal = trip_service.SessionLocal, sessions  # planner lookups and run records too
     mail.outbox.clear()
     transport = httpx.ASGITransport(app=app, client=("127.0.0.1", 50000))
     async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as client:
         yield client
     app.dependency_overrides.pop(get_session, None)
+    trip_service.SessionLocal = real_sessions
     await engine.dispose()

@@ -45,3 +45,9 @@ class TripResponse(BaseModel):
     activities: list[dict] = []
     food_options: list[dict] = []
     cost_breakdown: dict[str, float] = {}
+    # Places to eat from TripMate's guide (when the destination is in it).
+    food_places: list[dict] = []
+    # Which local models helped: { enabled, used, models, agents, fell_back, calls, ms }.
+    ai: dict = {}
+    # The recorded planning run, for the model activity page.
+    run_id: str | None = None

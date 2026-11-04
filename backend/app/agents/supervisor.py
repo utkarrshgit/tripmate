@@ -1,5 +1,6 @@
 from datetime import date
 
+from app.agents.context import RunContext
 from app.agents.state import AgentState
 from app.agents.planner import PlannerAgent
 from app.agents.destination_agent import DestinationAgent
@@ -34,7 +35,30 @@ class SupervisorAgent:
         self.itinerary = ItineraryAgent()
         self.critic = CriticAgent()
 
-    async def run(self, user_query: str, *, start_date: date | None = None, end_date: date | None = None) -> AgentState:
+    @property
+    def pipeline(self):
+        """Every agent, in the order it runs."""
+        return [
+            self.planner,  # 1. understand the request
+            self.destination,  # 2. gather what each part needs
+            self.transport,
+            self.hotel,
+            self.activity,
+            self.food,
+            self.budget,  # 3. add up the cost
+            self.itinerary,  # 4. lay out the days
+            self.critic,  # 5. check the result
+        ]
+
+    async def run(
+        self,
+        user_query: str,
+        *,
+        start_date: date | None = None,
+        end_date: date | None = None,
+        ctx: RunContext | None = None,
+    ) -> AgentState:
+        ctx = ctx or RunContext()
         state: AgentState = {
             "user_query": user_query,
             "destination": "",
@@ -50,32 +74,45 @@ class SupervisorAgent:
             state["start_date"] = start_date.isoformat()
             state["end_date"] = end_date.isoformat()
 
-        # 1. Understand the request.
-        state = await self.planner.run(state)
-
-        # 2. Gather domain-specific information.
-        for agent in [
-            self.destination,
-            self.transport,
-            self.hotel,
-            self.activity,
-            self.food,
-        ]:
-            state = await agent.run(state)
-
-        # 3. Calculate cost.
-        state = await self.budget.run(state)
-
-        # 4. Build itinerary.
-        state = await self.itinerary.run(state)
-
-        # 5. Validate the result.
-        state = await self.critic.run(state)
+        for agent in self.pipeline:
+            await ctx.progress(agent.name, "start", {})
+            calls_before = len(ctx.gateway.calls)
+            state = await agent.run(state, ctx)
+            calls = ctx.gateway.calls[calls_before:]
+            await ctx.progress(
+                agent.name,
+                "done",
+                {
+                    "ai": any(c.ok for c in calls),
+                    "fell_back": bool(calls) and not any(c.ok for c in calls),
+                    "models": sorted({c.model for c in calls if c.ok}),
+                    "summary": self._step_summary(agent.name, state),
+                },
+            )
 
         state["final_response"] = self._build_response(state)
-
-        self.logger.info("Trip completed by agents: %s", state["completed_agents"])
+        state["ai"] = ctx.gateway.summary()
+        self.logger.info("Trip completed by agents: %s (AI: %s)", state["completed_agents"], state["ai"])
         return state
+
+    @staticmethod
+    def _step_summary(agent: str, state: AgentState) -> str:
+        """One plain line per agent for the live progress, like "Goa · 4 days · 2 people"."""
+        if agent == "planner":
+            parts = [state.get("destination") or "Somewhere", f"{state.get('days', 0)} days", f"{state.get('travelers', 1)} people"]
+            return " · ".join(parts)
+        if agent == "destination":
+            return "Found in TripMate's guide" if state.get("destination_info", {}).get("in_catalog") else "Not in the guide yet"
+        if agent == "activity":
+            return f"Chose {len(state.get('activities', []))} things to do"
+        if agent == "budget":
+            return f"About ₹{state.get('total_cost', 0):,.0f} in total"
+        if agent == "itinerary":
+            return f"Laid out {len(state.get('itinerary', []))} days"
+        if agent == "critic":
+            n = len(state.get("issues", []))
+            return "No problems found" if n == 0 else f"{n} thing{'s' if n > 1 else ''} to check"
+        return ""
 
     def _build_response(self, state: AgentState) -> str:
         budget = state.get("budget", 0)

@@ -32,7 +32,7 @@ export default function Plan() {
     (plan, text) => setTimeout(() => navigate("/trip", { state: { plan, query: text, forTrip: incoming.current.forTrip ?? null } }), 400),
     [navigate],
   );
-  const { status, error, run, reset } = usePlanRequest(openPlan);
+  const { status, error, steps, run, reset } = usePlanRequest(openPlan);
 
   useEffect(() => {
     const { query: q, run: shouldRun, dates } = incoming.current;
@@ -60,7 +60,7 @@ export default function Plan() {
       <div className="container section">
         <div className="container-narrow planner-progress-wrap">
           <p className="t-body-sm c-mute planner-echo">“{query.trim()}”</p>
-          <PlanningProgress done={status === "done"} />
+          <PlanningProgress done={status === "done"} steps={steps} />
         </div>
         {/* A preview of the shape of what's coming, so the results don't arrive as a surprise */}
         <div className="planning-preview" aria-hidden="true">

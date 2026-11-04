@@ -29,7 +29,8 @@ class Settings(BaseSettings):
     # Development only: API responses include the code that was emailed, so the website can show it.
     dev_show_codes: bool = False
 
-    # Ollama and the three models TripMate uses.
+    # Ollama and the three models TripMate uses. AI_ENABLED=false plans with rules only.
+    ai_enabled: bool = True
     ollama_base_url: str = "http://localhost:11434"
     ollama_llm_model: str = "gemma4:e2b-mlx"  # writing: requests, itineraries, edits
     ollama_decision_model: str = "tev1:0.8b"  # yes/no and label checks

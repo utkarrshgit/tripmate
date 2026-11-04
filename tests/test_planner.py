@@ -1,5 +1,6 @@
 import pytest
 
+from app.agents.context import RunContext
 from app.agents.planner import PlannerAgent
 
 
@@ -10,7 +11,7 @@ async def test_planner_extracts_basic_trip():
         "completed_agents": [],
     }
 
-    result = await PlannerAgent().run(state)
+    result = await PlannerAgent().run(state, RunContext())
 
     assert result["days"] == 5
     assert result["travelers"] == 3
@@ -36,3 +37,20 @@ async def test_planner_extracts_basic_trip():
 )
 def test_destination_extraction(query, expected):
     assert PlannerAgent()._extract_destination(query) == expected
+
+
+@pytest.mark.parametrize(
+    "query, expected",
+    [
+        ("weekend in hampi with my wife", 2),
+        ("5 days in Manali for me and my 2 friends", 3),
+        ("Goa trip with 6 friends", 7),
+        ("a family of four to Goa", 4),
+        ("solo trip to Ladakh", 1),
+        ("my husband and I want Kerala", 2),
+        ("Plan a 4 day trip to Goa for 2 people", 2),
+        ("4 days in Goa", None),
+    ],
+)
+def test_group_size_in_words(query, expected):
+    assert PlannerAgent._travelers_from_words(query) == expected

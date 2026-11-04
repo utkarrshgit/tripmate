@@ -1,3 +1,6 @@
+import asyncio
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -8,9 +11,19 @@ from app.services.health_service import check_health
 from app.schemas.pricing import PriceRequest, PriceResponse
 from app.schemas.trip import TripRequest, TripResponse
 from app.services.pricing_service import PricingService
-from app.services.trip_service import TripService
+from app.llm.gateway import warm_up
+from app.services.trip_service import trip_service
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Load the general model in the background, so the first plan isn't slow and startup isn't blocked.
+    warming = asyncio.create_task(warm_up())
+    yield
+    warming.cancel()
+
 
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.app_name,
     version=settings.app_version,
     description="Multi-agent AI travel planner.",
@@ -29,7 +42,6 @@ app.add_middleware(
 install_error_handlers(app)
 app.include_router(api_v1)
 
-trip_service = TripService()
 pricing_service = PricingService()
 
 
@@ -41,33 +53,8 @@ async def health():
 
 @app.post("/api/trips/plan", response_model=TripResponse)
 async def plan_trip(request: TripRequest):
-    result = await trip_service.plan_trip(request.query, start_date=request.start_date, end_date=request.end_date)
-
-    return TripResponse(
-        destination=result.get("destination", ""),
-        days=result.get("days", 0),
-        travelers=result.get("travelers", 1),
-        budget=result.get("budget", 0),
-        total_cost=result.get("total_cost", 0),
-        itinerary=result.get("itinerary", []),
-        issues=result.get("issues", []),
-        completed_agents=result.get("completed_agents", []),
-        final_response=result.get("final_response", ""),
-        start_date=result.get("start_date"),
-        end_date=result.get("end_date"),
-        interests=result.get("interests", []),
-        destination_info=result.get("destination_info", {}),
-        transport_options=result.get("transport_options", []),
-        hotel_options=result.get("hotel_options", []),
-        activities=result.get("activities", []),
-        food_options=result.get("food_options", []),
-        cost_breakdown={
-            "transport": result.get("estimated_transport_cost", 0),
-            "hotel": result.get("estimated_hotel_cost", 0),
-            "activities": result.get("estimated_activity_cost", 0),
-            "food": result.get("estimated_food_cost", 0),
-        },
-    )
+    """Plans a trip in one response. /api/v1/plans/stream does the same with live progress."""
+    return await trip_service.plan_trip(request.query, start_date=request.start_date, end_date=request.end_date)
 
 
 @app.post("/api/trips/price", response_model=PriceResponse)
