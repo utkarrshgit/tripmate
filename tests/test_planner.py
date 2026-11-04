@@ -31,7 +31,8 @@ async def test_planner_extracts_basic_trip():
         ("Plan a trip to New Delhi from 12 Dec", "New Delhi"),
         ("Trip to Leh Ladakh, with friends", "Leh Ladakh"),
         ("Plan a trip in December to Goa", "Goa"),
-        ("Goa trip on Dec 12", "Unknown destination"),
+        ("Goa trip on Dec 12", "Goa"),
+        ("Jaipur 22–24 Jan with my wife", "Jaipur"),
         ("Plan something fun", "Unknown destination"),
     ],
 )

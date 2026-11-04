@@ -32,6 +32,15 @@ settings.ai_enabled = False
 
 
 @pytest.fixture(autouse=True)
+def empty_caches():
+    """Each test starts with empty caches: the database is emptied between tests, so cached IDs would be stale."""
+    from app.llm import gateway
+
+    for cache in (trip_service.catalog_cache, gateway.answers, gateway.vectors):
+        cache.clear()
+
+
+@pytest.fixture(autouse=True)
 def planner_uses_the_test_database(monkeypatch):
     """Every test, including ones that call the planner directly, records runs and reads the catalog
     in tripmate_test, never the main database."""
