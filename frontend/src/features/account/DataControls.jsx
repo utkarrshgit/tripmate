@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Modal } from "@/components/ui";
+import { PasswordField } from "@/features/auth";
 import { useSession } from "@/state/session";
 import { plural } from "@/utils/format";
 
@@ -25,11 +26,63 @@ function DataRow({ title, body, danger = false, action }) {
   );
 }
 
+/** Confirms account deletion with the password. */
+function DeleteAccountModal({ tripCount, onClose }) {
+  const { deleteAccount } = useSession();
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!password) return setError("Enter your password.");
+    setBusy(true);
+    try {
+      await deleteAccount(password);
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError(err.message);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Modal title="Delete your account?" onClose={onClose}>
+      {({ close }) => (
+        <form className="stack-xl modal-body" onSubmit={submit} noValidate>
+          <p className="t-body-md c-error">
+            This permanently deletes your account and {plural(tripCount, "saved trip")}. You can't undo this.
+          </p>
+          <PasswordField
+            label="Enter your password to confirm"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError(null);
+            }}
+            autoComplete="current-password"
+            error={error}
+            autoFocus
+          />
+          <div className="row modal-actions">
+            <Button onClick={close}>Cancel</Button>
+            <Button type="submit" variant="primary" disabled={busy}>
+              {busy ? "Deleting…" : "Delete account"}
+            </Button>
+          </div>
+        </form>
+      )}
+    </Modal>
+  );
+}
+
 /** Download / log out / delete account rows, plus the delete confirmation. */
 export default function DataControls() {
-  const { trips, exportData, deleteAccount, logOut } = useSession();
+  const { trips, exportData, logOut } = useSession();
   const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
+  const [downloadError, setDownloadError] = useState(null);
 
   return (
     <>
@@ -47,7 +100,17 @@ export default function DataControls() {
           title="Download your data"
           body="Your profile and saved trips as a JSON file."
           action={
-            <Button icon="download" onClick={() => downloadJson(exportData(), "tripmate-data.json")}>
+            <Button
+              icon="download"
+              onClick={async () => {
+                setDownloadError(null);
+                try {
+                  downloadJson(await exportData(), "tripmate-data.json");
+                } catch (err) {
+                  setDownloadError(err.message);
+                }
+              }}
+            >
               Download
             </Button>
           }
@@ -58,8 +121,8 @@ export default function DataControls() {
           action={
             <Button
               icon="logout"
-              onClick={() => {
-                logOut();
+              onClick={async () => {
+                await logOut();
                 navigate("/");
               }}
             >
@@ -78,30 +141,13 @@ export default function DataControls() {
           }
         />
       </ul>
-
-      {confirming && (
-        <Modal title="Delete your account?" onClose={() => setConfirming(false)}>
-          {({ close }) => (
-            <div className="stack-xl modal-body">
-              <p className="t-body-md c-error">
-                This permanently deletes your account and {plural(trips.length, "saved trip")}. You cannot undo this.
-              </p>
-              <div className="row modal-actions">
-                <Button onClick={close}>Cancel</Button>
-                <Button
-                  variant="primary"
-                  onClick={async () => {
-                    await deleteAccount();
-                    navigate("/", { replace: true });
-                  }}
-                >
-                  Delete account
-                </Button>
-              </div>
-            </div>
-          )}
-        </Modal>
+      {downloadError && (
+        <p className="field-error swap-in" role="alert">
+          {downloadError}
+        </p>
       )}
+
+      {confirming && <DeleteAccountModal tripCount={trips.length} onClose={() => setConfirming(false)} />}
     </>
   );
 }

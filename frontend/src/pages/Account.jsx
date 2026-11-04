@@ -1,5 +1,5 @@
 import { Avatar, Section } from "@/components/ui";
-import { DataControls, ProfileForm } from "@/features/account";
+import { DataControls, PasswordForm, ProfileForm, SessionsList } from "@/features/account";
 import { SignedOutPrompt } from "@/features/auth";
 import { useSession } from "@/state/session";
 import { formatDate, plural } from "@/utils/format";
@@ -21,6 +21,12 @@ export default function Account() {
       </div>
       <Section title="Profile" intro="The name and email on your account." headingClass="t-heading-lg">
         <ProfileForm />
+      </Section>
+      <Section title="Password" intro="Changing it signs you out on every other device." headingClass="t-heading-lg">
+        <PasswordForm />
+      </Section>
+      <Section title="Signed-in devices" intro="Where your account is signed in right now." headingClass="t-heading-lg">
+        <SessionsList />
       </Section>
       <Section title="Your data" headingClass="t-heading-lg">
         <DataControls />

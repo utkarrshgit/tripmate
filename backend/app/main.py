@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1 import router as api_v1
 from app.core.config import settings
+from app.core.errors import install_error_handlers
 from app.services.health_service import check_health
 from app.schemas.pricing import PriceRequest, PriceResponse
 from app.schemas.trip import TripRequest, TripResponse
@@ -23,6 +25,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+install_error_handlers(app)
+app.include_router(api_v1)
 
 trip_service = TripService()
 pricing_service = PricingService()

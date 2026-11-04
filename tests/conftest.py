@@ -9,14 +9,18 @@ import subprocess
 import sys
 from pathlib import Path
 
+import httpx
 import pytest
 import pytest_asyncio
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 from app.db.base import Base
+from app.db.session import get_session
+from app.main import app
+from app.services import mail
 
 BACKEND = Path(__file__).resolve().parent.parent / "backend"
 
@@ -41,4 +45,23 @@ async def db(migrated_test_db) -> AsyncSession:
         await conn.execute(text(f"TRUNCATE {tables} RESTART IDENTITY CASCADE"))
     async with AsyncSession(engine, expire_on_commit=False) as session:
         yield session
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture
+async def api(db):
+    """An HTTP client for the app, on the test database, keeping cookies like a browser. Starts with an empty outbox."""
+    engine = create_async_engine(settings.test_database_url, poolclass=NullPool)
+    sessions = async_sessionmaker(engine, expire_on_commit=False)
+
+    async def test_session():
+        async with sessions() as session:
+            yield session
+
+    app.dependency_overrides[get_session] = test_session
+    mail.outbox.clear()
+    transport = httpx.ASGITransport(app=app, client=("127.0.0.1", 50000))
+    async with httpx.AsyncClient(transport=transport, base_url="http://localhost") as client:
+        yield client
+    app.dependency_overrides.pop(get_session, None)
     await engine.dispose()

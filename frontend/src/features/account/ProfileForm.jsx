@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { Button, Modal, StatusPill, TextField } from "@/components/ui";
-import { CodeStep, validateAccount } from "@/features/auth";
+import { CodeStep, PasswordField, validateAccount } from "@/features/auth";
 import { requestEmailChange, resendCode } from "@/state/authApi";
 import { useSession } from "@/state/session";
 
@@ -37,7 +37,7 @@ function EmailCodeModal({ pending, onClose, onDone }) {
 
 export default function ProfileForm() {
   const { user, updateName } = useSession();
-  const [values, setValues] = useState({ name: user.name, email: user.email });
+  const [values, setValues] = useState({ name: user.name, email: user.email, password: "" });
   const [errors, setErrors] = useState({});
   const [saved, setSaved] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -53,12 +53,13 @@ export default function ProfileForm() {
   async function submit(e) {
     e.preventDefault();
     const next = validateAccount(values);
+    if (emailChanged && !values.password) next.password = "Enter your current password to change your email.";
     setErrors(next);
     if (Object.keys(next).length) return;
     setBusy(true);
     try {
       if (nameChanged) await updateName(values.name);
-      if (emailChanged) setPendingEmail(await requestEmailChange({ currentEmail: user.email, newEmail: values.email }));
+      if (emailChanged) setPendingEmail(await requestEmailChange({ newEmail: values.email, password: values.password }));
       else setSaved(true);
     } catch (err) {
       setErrors(err.field ? { [err.field]: err.message } : { form: err.message });
@@ -80,6 +81,15 @@ export default function ProfileForm() {
           help={emailChanged ? "We'll send a code to the new address to confirm it." : undefined}
           error={errors.email}
         />
+        {emailChanged && (
+          <PasswordField
+            label="Current password"
+            value={values.password}
+            onChange={set("password")}
+            autoComplete="current-password"
+            error={errors.password}
+          />
+        )}
         {errors.form && (
           <p className="field-error swap-in" role="alert">
             {errors.form}
@@ -101,7 +111,7 @@ export default function ProfileForm() {
           pending={pendingEmail}
           onClose={() => setPendingEmail(null)}
           onDone={() => {
-            setValues((v) => ({ ...v, email: pendingEmail.email }));
+            setValues((v) => ({ ...v, email: pendingEmail.email, password: "" }));
             setSaved(true);
           }}
         />
