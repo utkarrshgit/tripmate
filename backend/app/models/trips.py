@@ -65,10 +65,13 @@ class PlanVersion(UUIDPrimaryKey, CreatedAt, Base):
     total_cost: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     cost_breakdown: Mapped[dict] = mapped_column(JSONB, server_default="{}")
     issues: Mapped[list] = mapped_column(JSONB, server_default="[]")
+    # The planner's full response, so a saved trip shows exactly what was planned. Its day-by-day
+    # itinerary is rebuilt from itinerary_items when read, so item edits show up.
+    plan: Mapped[dict] = mapped_column(JSONB, server_default="{}")
 
     trip: Mapped[Trip] = relationship(back_populates="versions", foreign_keys=[trip_id])
     items: Mapped[list["ItineraryItem"]] = relationship(
-        back_populates="version", cascade="all, delete-orphan", passive_deletes=True, order_by="(ItineraryItem.day_no, ItineraryItem.position)"
+        back_populates="version", cascade="all, delete-orphan", passive_deletes=True, order_by="[ItineraryItem.day_no, ItineraryItem.position]"
     )
 
 

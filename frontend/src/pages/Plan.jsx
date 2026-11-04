@@ -28,7 +28,8 @@ export default function Plan() {
   const [askForDates, setAskForDates] = useState(false);
 
   const openPlan = useCallback(
-    (plan, text) => setTimeout(() => navigate("/trip", { state: { plan, query: text } }), 400),
+    // `forTrip` ({ id, title }) comes from a saved trip's Plan again: the result saves as its next version.
+    (plan, text) => setTimeout(() => navigate("/trip", { state: { plan, query: text, forTrip: incoming.current.forTrip ?? null } }), 400),
     [navigate],
   );
   const { status, error, run, reset } = usePlanRequest(openPlan);

@@ -69,7 +69,7 @@ Import from `src` with the `@/` alias, e.g. `import { Button } from "@/component
 | Add a destination or interest | `data/catalog.js`. Interests must match the backend parser's keywords. |
 | Show AI activity somewhere new | Use `<ThoughtLine>` from `@/components/ui`: `working` while it runs, `steps` for the trace, `doneLabel` for the settled sentence. Planner step wording (`doing`, `did`) lives in `PLANNERS` in `data/catalog.js`. |
 | Change how accounts work | Accounts use the API (`/api/v1/auth`, `/api/v1/users/me`) through `state/authApi.js`, one function per endpoint. The session is an HttpOnly cookie, so requests use `credentials: "include"`. `devCode` appears only while the API has `DEV_SHOW_CODES=true`. |
-| Hook up saved trips | Replace the localStorage trip functions in `state/session.jsx`; components only use `useSession()`. |
+| Change how saved trips work | Trips use the API (`/api/v1/trips`, `/api/v1/shared`) through `state/tripsApi.js`. The account's trip list lives in `useSession()`; a page that shows one trip loads it with `useTrip(id)` from `features/trips`. Save a plan with `useTripSaver()`, which also handles saving as a new version of a trip. |
 
 ## Design and motion rules
 
