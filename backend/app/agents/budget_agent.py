@@ -1,11 +1,12 @@
 from app.agents.base import BaseAgent
+from app.agents.context import RunContext
 from app.agents.state import AgentState
 
 
 class BudgetAgent(BaseAgent):
     name = "budget"
 
-    async def run(self, state: AgentState) -> AgentState:
+    async def run(self, state: AgentState, ctx: RunContext) -> AgentState:
         total = (
             state.get("estimated_transport_cost", 0)
             + state.get("estimated_hotel_cost", 0)

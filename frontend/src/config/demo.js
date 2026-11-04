@@ -6,15 +6,13 @@
  *
  * - Only active in development (`npm run dev`); production builds always use 0.
  * - Turn off in dev with VITE_DEMO_DELAYS=false in frontend/.env.local.
- * - To remove entirely: delete this file and the two `withDemoDelay` calls
- *   (features/planner/usePlanRequest.js, features/system/UnavailablePanel.jsx,
- *   features/pricing/usePriceRequest.js).
+ * - To remove entirely: delete this file and the `withDemoDelay` calls
+ *   (features/system/UnavailablePanel.jsx, features/pricing/usePriceRequest.js).
+ *   Planning has no delay: it streams real progress.
  */
 const enabled = import.meta.env.DEV && import.meta.env.VITE_DEMO_DELAYS !== "false";
 
 export const DEMO_DELAYS = {
-  // Long enough for all nine planners to take their turn (9 × 450ms) before "ready".
-  planningMs: enabled ? 4500 : 0,
   // Long enough to see the "retrying" orb while the service check runs.
   healthCheckMs: enabled ? 1800 : 0,
   // Long enough to see the "searching" orb while exact prices load.

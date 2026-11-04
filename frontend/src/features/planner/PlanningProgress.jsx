@@ -1,32 +1,28 @@
-import { useEffect, useState } from "react";
 import { ThoughtLine } from "@/components/ui";
-import { PLANNERS } from "@/data/catalog";
-
-const STEP_MS = 450;
+import { plannerById } from "@/data/catalog";
 
 /**
- * The planning screen's status: one ThoughtLine whose trace grows planner by planner,
- * in the order the backend runs them, then settles into "Planned in 4.5s".
- * The API answers in one response, so the steps are a guide to what's happening
- * rather than live progress; `done` settles the line.
+ * The planning screen's status: one ThoughtLine whose trace grows as the API reports each
+ * planner (streamed), then settles into "Planned in 12.4s". A finished step shows what it
+ * found ("Read your request · Goa · 4 days · 2 people") and whether a local model helped.
  */
-export default function PlanningProgress({ done }) {
-  const [step, setStep] = useState(0);
+export default function PlanningProgress({ done, steps = [] }) {
+  const lines = steps.map((step) => {
+    const planner = plannerById(step.agent);
+    if (!planner) return step.agent;
+    if (step.phase === "start") return planner.doing;
+    const extra = [step.summary, step.ai ? "with AI" : step.fell_back ? "with rules" : null].filter(Boolean).join(" · ");
+    return extra ? `${planner.did} · ${extra}` : planner.did;
+  });
+  const usingModel = steps.some((s) => s.phase === "start" && ["planner", "activity", "itinerary"].includes(s.agent));
 
-  useEffect(() => {
-    if (done) return undefined;
-    const id = setInterval(() => setStep((s) => Math.min(s + 1, PLANNERS.length - 1)), STEP_MS);
-    return () => clearInterval(id);
-  }, [done]);
-
-  const shown = done ? PLANNERS.length : step + 1;
   return (
     <div className="feature-card feature-card-soft planning">
       <ThoughtLine
         working={!done}
-        label="Planning your trip…"
+        label={usingModel ? "Planning your trip with a local AI model…" : "Planning your trip…"}
         doneLabel="Planned in"
-        steps={PLANNERS.slice(0, shown).map((p) => p.doing)}
+        steps={lines.length ? lines : ["Starting the planners"]}
         collapseOnSettle={false}
         fontSize={20}
         color="var(--color-ink)"

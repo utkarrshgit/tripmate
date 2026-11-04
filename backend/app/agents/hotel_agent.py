@@ -1,11 +1,12 @@
 from app.agents.base import BaseAgent
+from app.agents.context import RunContext
 from app.agents.state import AgentState
 
 
 class HotelAgent(BaseAgent):
     name = "hotel"
 
-    async def run(self, state: AgentState) -> AgentState:
+    async def run(self, state: AgentState, ctx: RunContext) -> AgentState:
         days = max(state.get("days", 3), 1)
         travelers = max(state.get("travelers", 1), 1)
 

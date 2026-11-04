@@ -8,6 +8,7 @@ const RATIOS = ["4 / 5", "1 / 1", "3 / 4", "4 / 5"];
 export default function ThingsToDoSection({ plan }) {
   const items = [
     ...(plan.activities ?? []).map((a) => ({ key: a.name, name: a.name, price: rupees(a.estimated_cost) })),
+    ...(plan.food_places ?? []).map((f) => ({ key: `food-${f.name}`, name: f.name, price: `${rupees(f.cost_per_person)} a person` })),
     ...(plan.food_options ?? []).map((f) => ({
       key: f.category,
       name: titleCase(f.category),

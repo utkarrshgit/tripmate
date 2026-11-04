@@ -57,13 +57,31 @@ def _date(value) -> date | None:
 def items_from_plan(plan: dict) -> list[ItineraryItem]:
     """One item per filled-in part of each day. An activity's estimated cost goes on its item."""
     costs = {a.get("name"): a.get("estimated_cost", 0) for a in plan.get("activities", []) if a.get("name")}
+    # Catalog places the planner chose, so each item can point at the place it came from.
+    place_ids = {p.get("name"): p.get("place_id") for p in [*plan.get("activities", []), *plan.get("food_places", [])] if p.get("place_id")}
     items = []
     for day in plan.get("itinerary", []):
         for slot in SLOTS:
             title = (day.get(slot) or "").strip()
             if title:
-                items.append(ItineraryItem(day_no=int(day.get("day", 1)), slot=slot, position=0, title=title[:150], est_cost=_money(costs.get(title, 0))))
+                items.append(
+                    ItineraryItem(
+                        day_no=int(day.get("day", 1)),
+                        slot=slot,
+                        position=0,
+                        title=title[:150],
+                        est_cost=_money(costs.get(title, 0)),
+                        place_id=_uuid(place_ids.get(title)),
+                    )
+                )
     return items
+
+
+def _uuid(value):
+    try:
+        return uuid.UUID(str(value)) if value else None
+    except ValueError:
+        return None
 
 
 def plan_with_items(version: PlanVersion) -> dict:

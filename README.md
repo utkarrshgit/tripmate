@@ -53,7 +53,7 @@ TripMate is an early-stage project. Today:
 | Real flight / hotel / place data | 🔍 Being evaluated ([API research](docs/API_RESEARCH.md)) |
 | Accounts | ✅ Email and password with a 6-digit email code, sign-in that survives a refresh, password reset, signed-in devices, account deletion, and admin tools |
 | Saved trips | ✅ Saved to your account: rename, edit each day, plan again as a new version and restore older ones, share a read-only link, and a 30-day Recently deleted |
-| AI language model in the planners | ⚠️ Planners use fixed rules today; a local model (Ollama) is wired in but not used yet |
+| Local AI in the planners | ✅ gemma4 reads requests, picks places and lays out the days; tev1 spots requests that aren't trips; live progress as it plans. Every answer is checked, and the planners fall back to rules when Ollama is off |
 | Privacy Policy and Terms | ⚠️ Drafts with placeholders, pending legal review |
 | Photos | ⚠️ Image slots are in place; photos to be added |
 
@@ -92,7 +92,7 @@ run.sh       One command to set up and start everything
 ## What's next
 
 1. Connect real data for flights, stays and places (choices in [API research](docs/API_RESEARCH.md))
-2. Use the local AI models inside the planners, choosing from each destination's places (accounts and saved trips are done)
+2. Change a plan in words ("make day 2 more relaxed"), search trips by meaning, and a page showing how the AI models performed
 3. Maps and route planning between activities
 4. A review step that can send a plan back for another pass when something's off
 5. Automated testing and deployment

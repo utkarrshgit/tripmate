@@ -165,6 +165,7 @@ The API reads `backend/.env` (created from `.env.example` in step 3):
 | `OTP_SECRET` | Signs the 6-digit email codes. Make your own with `python -c "import secrets; print(secrets.token_hex(32))"` | a placeholder |
 | `MAIL_MODE`, `SMTP_HOST`, `SMTP_PORT` | Where sign-up and reset codes go: `console` prints them in the API log; `smtp` sends them, for example to [Mailpit](https://mailpit.axllent.org) on port 1025 | `console` |
 | `DEV_SHOW_CODES` | Development only: shows each emailed code on the website, so you can sign up without an inbox. Never turn this on for real users | `true` |
+| `AI_ENABLED` | Use the local models in the planners (`false` plans with rules only) | `true` |
 | `OLLAMA_BASE_URL` | Where Ollama runs | `http://localhost:11434` |
 | `OLLAMA_LLM_MODEL`, `OLLAMA_DECISION_MODEL`, `OLLAMA_EMBED_MODEL` | The three local models (see below) | `gemma4:e2b-mlx`, `tev1:0.8b`, `qwen3-embedding:0.6b` |
 
@@ -196,7 +197,11 @@ TripMate uses three local models through [Ollama](https://ollama.com):
 | `tev1:0.8b` | A decision model: quick yes, no and label checks |
 | `qwen3-embedding:0.6b` | Search by meaning |
 
-Install Ollama, then pull them with `ollama pull gemma4:e2b-mlx`, `ollama pull tev1:0.8b` and `ollama pull qwen3-embedding:0.6b`. Open http://localhost:8000/health to check that the API sees all three. The planners don't call the models yet; that arrives in a later step.
+Install Ollama, then pull them with `ollama pull gemma4:e2b-mlx`, `ollama pull tev1:0.8b` and `ollama pull qwen3-embedding:0.6b`. Open http://localhost:8000/health to check that the API sees all three.
+
+The planners use the models when Ollama is running, and use rules when it isn't, so planning always works. The result says which it used. A plan with the models takes about 10–25 seconds, and the website shows each step as it happens. To plan with rules only, set `AI_ENABLED=false` in `backend/.env`.
+
+The tests use rules and a fake model, so they don't need Ollama. To also check the real models, run `RUN_OLLAMA_TESTS=1 pytest` from `backend/`.
 
 ## Troubleshooting
 
