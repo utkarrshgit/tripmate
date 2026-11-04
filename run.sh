@@ -41,6 +41,26 @@ if changed requirements-dev.txt backend || changed requirements.txt backend-base
 fi
 [ -f .env ] || { say "Creating backend/.env from .env.example"; cp .env.example .env; }
 
+# --- Database ---------------------------------------------------------------
+# Creates the databases named in backend/.env if they're missing, applies migrations
+# and loads the destination catalog. Returns 2 when PostgreSQL isn't available.
+setup_db() {
+  command -v pg_isready >/dev/null && command -v createdb >/dev/null || return 2
+  pg_isready -q || return 2
+  local names
+  names="$("$VPY" -c 'from urllib.parse import urlparse; from app.core.config import settings as s; print(*(urlparse(u).path.lstrip("/") for u in (s.database_url, s.test_database_url)))')" || return 1
+  for db in $names; do
+    psql -d postgres -Atc "SELECT 1 FROM pg_database WHERE datname = '$db'" | grep -q 1 || createdb "$db" || return 1
+  done
+  "$VPY" -m alembic upgrade head && "$VPY" -m app.cli seed-catalog
+}
+db_status=0; setup_db > "$STATE/db.log" 2>&1 || db_status=$?
+case "$db_status" in
+  0) say "Database ready" ;;
+  2) say "PostgreSQL isn't running, so accounts and saved trips won't work yet. Start it with: brew services start postgresql@18" ;;
+  *) tail -n 15 "$STATE/db.log"; fail "Database setup failed — error above (full log: .run/db.log)" ;;
+esac
+
 # --- Frontend ---------------------------------------------------------------
 cd "$ROOT/frontend"
 if [ ! -d node_modules ] || changed package-lock.json frontend; then
@@ -83,7 +103,8 @@ trap cleanup EXIT                 # every way out stops both servers…
 trap 'exit 130' INT TERM HUP      # …including Ctrl+C, kill, or closing the terminal
 
 say "Starting API on :$API_PORT (log: .run/api.log)"
-(cd "$ROOT/backend" && exec "$VPY" -m uvicorn app.main:app --reload --port "$API_PORT") > "$STATE/api.log" 2>&1 &
+# The API accepts cookies only from the website's own address.
+(cd "$ROOT/backend" && CORS_ORIGINS="http://localhost:$WEB_PORT,http://127.0.0.1:$WEB_PORT" exec "$VPY" -m uvicorn app.main:app --reload --port "$API_PORT") > "$STATE/api.log" 2>&1 &
 PIDS+=($!)
 
 # Wait for /health (up to 30 s); show the log if it never comes up.

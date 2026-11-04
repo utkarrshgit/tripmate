@@ -3,5 +3,8 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 httpx
-sqlalchemy
 python-dotenv
+# Database: SQLAlchemy 2 (async) over asyncpg, with Alembic migrations
+sqlalchemy[asyncio]>=2.0.36
+asyncpg>=0.30
+alembic>=1.14

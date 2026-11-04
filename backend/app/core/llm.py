@@ -9,7 +9,7 @@ class LLMClient:
 
     def __init__(self):
         self.base_url = settings.ollama_base_url.rstrip("/")
-        self.model = settings.ollama_model
+        self.model = settings.ollama_llm_model
         self.logger = get_logger("llm")
 
     async def generate(self, prompt: str, system: str = "") -> str:
