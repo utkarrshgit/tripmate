@@ -87,6 +87,12 @@ def _uuid(value):
 def plan_with_items(version: PlanVersion) -> dict:
     """The version's plan with its itinerary rebuilt from the current items (several in a slot are joined)."""
     plan = copy.deepcopy(version.plan)
+    place = plan.get("destination") or ""
+    free = {
+        "morning": f"Breakfast and a slow start in {place}" if place else "Breakfast and a slow start",
+        "afternoon": f"Free time to explore {place}" if place else "Free time to explore",
+        "evening": "Local food and time to explore",
+    }
     start = plan.get("start_date")
     start = date.fromisoformat(start) if isinstance(start, str) and start else None
     days = max([plan.get("days", 0)] + [i.day_no for i in version.items])
@@ -95,7 +101,7 @@ def plan_with_items(version: PlanVersion) -> dict:
         day = {"day": day_no, "date": (start + timedelta(days=day_no - 1)).isoformat() if start else None}
         for slot in SLOTS:
             titles = [i.title for i in version.items if i.day_no == day_no and i.slot == slot]
-            day[slot] = " · ".join(titles)
+            day[slot] = " · ".join(titles) or free[slot]  # a slot emptied by an edit reads as free time
         itinerary.append(day)
     plan["itinerary"] = itinerary
     plan["total_cost"] = float(version.total_cost)
@@ -200,6 +206,7 @@ async def detail(db: AsyncSession, trip: Trip) -> dict:
             for i in sorted(current.items, key=lambda i: (i.day_no, SLOTS.index(i.slot), i.position))
         ],
         "pricing": await _latest_pricing(db, trip),
+        "revision": current.plan.get("revision"),
         "versions": [_version_summary(trip, v) for v in sorted(trip.versions, key=lambda v: v.version_no, reverse=True)],
     }
 

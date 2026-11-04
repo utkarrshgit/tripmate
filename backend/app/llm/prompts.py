@@ -10,7 +10,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-PROMPT_VERSION = "2026-11-05.3"
+PROMPT_VERSION = "2026-11-05.5"
 
 Interest = Literal["adventure", "trekking", "nature", "food", "nightlife", "culture", "shopping", "beaches", "mountains", "photography", "history", "spiritual"]
 
@@ -77,3 +77,37 @@ Rules:
 
 # Yes/no questions are answered as the probability of yes.
 IS_TRIP_REQUEST = {"q1": {"type": "noul", "instructions": "Is this a request to plan a trip or holiday?"}}
+
+
+# ---- Reviser: change a plan in words --------------------------------------------
+
+Slot = Literal["morning", "afternoon", "evening"]
+
+
+class Edit(BaseModel):
+    action: Literal["remove", "replace", "add", "move"]
+    item_id: str = Field("", description="For remove, replace and move: an item ID like i3")
+    place_id: str = Field("", description='For replace and add: a place ID like p2, or "free" for free time')
+    day: int | None = Field(None, ge=1, le=60, description="For add and move: the day")
+    slot: Slot | None = Field(None, description="For add and move: the part of the day")
+
+
+class Revision(BaseModel):
+    edits: list[Edit] = Field(max_length=12)
+
+
+REVISE_PLAN = """You change a TripMate itinerary to follow the traveller's instruction.
+You get the current items, each with an ID like i3, its day, part of the day and title,
+and places that can be added, each with an ID like p2 (none of them is in the plan yet).
+Return only the edits the instruction asks for, and leave everything else alone.
+- remove: take item i? out of the plan
+- replace: put place p? in item i?'s place, or "free" for free time
+- add: put place p? on a day and part of the day
+- move: move item i? to a day and part of the day
+If the instruction names a day, only change that day.
+"More relaxed" or "lighter" means replacing one activity on that day with "free".
+"Swap X for Y" means replace the item named X with the place named Y.
+Food places belong in the evening."""
+
+# This wording tested best on tev1:0.8b: real edits score 0.36–0.94, a weather question 0.05.
+IS_PLAN_CHANGE = {"q1": {"type": "noul", "instructions": "Does this ask to change a travel plan, for example making a day lighter or busier, or adding, removing, swapping or moving something?"}}

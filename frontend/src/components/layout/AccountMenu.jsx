@@ -40,6 +40,11 @@ export default function AccountMenu() {
             <Link role="menuitem" to="/account" className="menu-item" onClick={close}>
               <Icon name="user" size={18} /> Account
             </Link>
+            {user.role === "admin" && (
+              <Link role="menuitem" to="/admin/ai" className="menu-item" onClick={close}>
+                <Icon name="sparkle" size={18} /> AI activity
+              </Link>
+            )}
             <button
               role="menuitem"
               type="button"

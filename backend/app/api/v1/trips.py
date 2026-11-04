@@ -12,8 +12,8 @@ from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import DB, Current, current
-from app.schemas.trips import ImportIn, ItemIn, ItemPatch, PricingIn, ShareOut, SharedTripOut, TripIn, TripOut, TripPage, TripPatch, VersionIn
-from app.services import saved_trips as trips
+from app.schemas.trips import ImportIn, ItemIn, ReviseIn, ItemPatch, PricingIn, ShareOut, SharedTripOut, TripIn, TripOut, TripPage, TripPatch, VersionIn
+from app.services import reviser, saved_trips as trips
 
 router = APIRouter(prefix="/trips", tags=["trips"])
 shared = APIRouter(tags=["shared"])
@@ -85,6 +85,13 @@ async def restore_trip(trip_id: uuid.UUID, cur: Current = Depends(current), db: 
 async def plan_again(trip_id: uuid.UUID, body: VersionIn, cur: Current = Depends(current), db: AsyncSession = DB):
     """Saves a new plan for the trip as the next version, and shows it."""
     return await trips.add_version(db, cur.user, trip_id, body.query, body.plan.model_dump(mode="json"))
+
+
+@router.post("/{trip_id}/revise", response_model=TripOut)
+async def revise(trip_id: uuid.UUID, body: ReviseIn, cur: Current = Depends(current), db: AsyncSession = DB):
+    """Changes the plan from a sentence, like "make day 2 more relaxed", using the local model.
+    The result is a new version; `revision.changes` says what changed."""
+    return await reviser.revise_trip(db, cur.user, trip_id, body.instruction)
 
 
 @router.get("/{trip_id}/versions/{no}")

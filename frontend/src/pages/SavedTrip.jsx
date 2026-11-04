@@ -4,7 +4,7 @@ import { TripSkeleton } from "@/app/PageSkeletons";
 import { Button, Icon, Notice } from "@/components/ui";
 import { SignedOutPrompt } from "@/features/auth";
 import { NotFoundView } from "@/features/system";
-import { ConfirmDeleteTrip, ItineraryEditor, RenameTripModal, ShareTripModal, TripPlanView, VersionHistory, useTrip } from "@/features/trips";
+import { ConfirmDeleteTrip, ItineraryEditor, RenameTripModal, ReviseBox, ShareTripModal, SimilarPlaces, TripPlanView, VersionHistory, useTrip } from "@/features/trips";
 import { useSession } from "@/state/session";
 import { formatDate, rupees } from "@/utils/format";
 
@@ -90,7 +90,9 @@ export default function SavedTrip() {
           </>
         }
       />
+      <ReviseBox trip={trip} onChange={update} />
       <VersionHistory trip={trip} onRestored={update} />
+      <SimilarPlaces destination={trip.plan.destination} />
 
       {open === "edit" && <ItineraryEditor trip={trip} onChange={update} onClose={() => setOpen(null)} />}
       {open === "share" && <ShareTripModal trip={trip} onClose={() => setOpen(null)} />}

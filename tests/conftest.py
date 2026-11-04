@@ -31,6 +31,14 @@ BACKEND = Path(__file__).resolve().parent.parent / "backend"
 settings.ai_enabled = False
 
 
+@pytest.fixture(autouse=True)
+def planner_uses_the_test_database(monkeypatch):
+    """Every test, including ones that call the planner directly, records runs and reads the catalog
+    in tripmate_test, never the main database."""
+    engine = create_async_engine(settings.test_database_url, poolclass=NullPool)
+    monkeypatch.setattr(trip_service, "SessionLocal", async_sessionmaker(engine, expire_on_commit=False))
+
+
 @pytest.fixture(scope="session")
 def migrated_test_db() -> str:
     url = settings.test_database_url

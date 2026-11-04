@@ -23,6 +23,7 @@ const trip = (t) => ({
     items: t.items.map((i) => ({ id: i.id, dayNo: i.day_no, slot: i.slot, position: i.position, title: i.title, note: i.note, estCost: i.est_cost })),
     pricing: t.pricing,
     versions: t.versions.map(version),
+    changes: t.revision?.changes ?? null,
   }),
 });
 
@@ -75,4 +76,21 @@ export const revokeShare = (shareId) => call("DELETE", `/shares/${shareId}`);
 export async function openShared(token) {
   const { data } = await call("GET", `/shared/${encodeURIComponent(token)}`);
   return { title: data.title, query: data.query, plan: data.plan, sharedBy: data.shared_by, savedAt: data.saved_at };
+}
+
+/** "Change it in words": a new version from a sentence. The trip comes back with `changes` (plain-language list). */
+export async function reviseTrip(id, instruction) {
+  const { data } = await call("POST", `/trips/${id}/revise`, { instruction });
+  return { ...trip(data), changes: data.changes ?? data.revision?.changes ?? [] };
+}
+
+/** Your trips, ranked by meaning ({ mode: "meaning" | "words", results }). */
+export async function searchTrips(q) {
+  const { data } = await call("GET", `/search/trips?q=${encodeURIComponent(q)}`);
+  return { mode: data.mode, results: data.results.map((r) => ({ ...trip(r), score: r.score })) };
+}
+
+/** Destinations like this one, from the catalog ({ mode, results: [{ slug, name, state, summary, interests }] }). */
+export async function similarDestinations(slug) {
+  return (await call("GET", `/destinations/${encodeURIComponent(slug)}/similar`)).data;
 }
