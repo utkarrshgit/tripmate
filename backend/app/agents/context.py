@@ -26,3 +26,5 @@ class RunContext:
     progress: Progress = _no_progress
     # Filled by the destination agent: {"destination": {...}, "places": [...]} or None.
     catalog: dict | None = None
+    # Filled by the transport agent: the run's price estimate (app/pricing/heuristics.py).
+    estimate: object | None = None

@@ -35,6 +35,16 @@ export default function SpendSection({ plan }) {
             );
           })}
         </ul>
+        {plan.estimate_notes?.length > 0 && (
+          <details className="spend-notes">
+            <summary className="t-body-sm-strong c-ink">How we estimated this</summary>
+            <ul className="t-body-sm c-body">
+              {plan.estimate_notes.map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          </details>
+        )}
       </Reveal>
     </Section>
   );

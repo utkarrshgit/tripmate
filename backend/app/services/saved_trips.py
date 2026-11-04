@@ -22,7 +22,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core import security
 from app.core.errors import AppError
-from app.models import Destination, ItineraryItem, PlanVersion, PriceQuote, Trip, TripShare, User
+from app.models import Destination, ItineraryItem, Place, PlanVersion, PriceQuote, Trip, TripShare, User
 
 SLOTS = ("morning", "afternoon", "evening")
 TRASH_DAYS = 30
@@ -119,6 +119,17 @@ async def _destination_id(db: AsyncSession, name: str):
     if not name:
         return None
     return await db.scalar(select(Destination.id).where(func.lower(Destination.name) == name.strip().lower()))
+
+
+async def _drop_missing_places(db: AsyncSession, items: list[ItineraryItem]) -> list[ItineraryItem]:
+    """Unlinks items from places that no longer exist (a catalog refreshed since the plan was made)."""
+    ids = {i.place_id for i in items if i.place_id}
+    if ids:
+        existing = set((await db.scalars(select(Place.id).where(Place.id.in_(ids)))).all())
+        for i in items:
+            if i.place_id and i.place_id not in existing:
+                i.place_id = None
+    return items
 
 
 def _new_version(trip: Trip, no: int, query: str, plan: dict, source: str, items: list[ItineraryItem] | None = None) -> PlanVersion:
@@ -250,7 +261,7 @@ async def create_trip(db: AsyncSession, user: User, query: str, plan: dict, pric
         budget=_money(plan.get("budget")),
     )
     db.add(trip)
-    version = _new_version(trip, 1, query, plan, "plan")
+    version = _new_version(trip, 1, query, plan, "plan", await _drop_missing_places(db, items_from_plan(plan)))
     db.add(version)
     await db.flush()
     trip.current_version_id = version.id
@@ -305,7 +316,7 @@ async def delete_forever(db: AsyncSession, user: User, trip_id) -> None:
 async def add_version(db: AsyncSession, user: User, trip_id, query: str, plan: dict, *, source: str = "plan") -> dict:
     """A new plan for the trip (planning again). It becomes the current version."""
     trip = await _load(db, user, trip_id)
-    version = _new_version(trip, max(v.version_no for v in trip.versions) + 1, query, plan, source)
+    version = _new_version(trip, max(v.version_no for v in trip.versions) + 1, query, plan, source, await _drop_missing_places(db, items_from_plan(plan)))
     db.add(version)
     await db.flush()
     trip.current_version_id = version.id

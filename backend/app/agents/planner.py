@@ -4,7 +4,10 @@ from datetime import date
 from app.agents.base import BaseAgent
 from app.agents.context import RunContext
 from app.agents.state import AgentState
+from app.db.seed_data import DESTINATIONS
 from app.llm import prompts
+
+KNOWN_PLACES = [d["name"] for d in DESTINATIONS]
 
 # Below this probability of "yes, this is a trip request", the plan says so.
 NOT_A_TRIP = 0.2
@@ -89,6 +92,11 @@ class PlannerAgent(BaseAgent):
                 name = match.group(1).strip(" .,'-")
                 if name and not re.fullmatch(rf"(?:{self._STOP_WORDS})", name, re.IGNORECASE):
                     return name.title() if name.islower() else name
+        # Last, any destination TripMate knows, wherever it is ("Jaipur 22–24 Jan with my wife").
+        lowered = query.lower()
+        for name in KNOWN_PLACES:
+            if re.search(rf"\b{re.escape(name.lower())}\b", lowered):
+                return name
         return "Unknown destination"
 
     def _extract_days(self, query: str) -> int:

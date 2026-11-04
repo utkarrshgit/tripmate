@@ -455,3 +455,17 @@
   width: calc(var(--rate) * 100%);
   background: var(--color-success-deep);
 }
+
+/* Why the estimate is what it is: season, festivals, weekends, booking ahead */
+.spend-notes {
+  margin-top: var(--spacing-lg);
+}
+.spend-notes summary {
+  cursor: pointer;
+}
+.spend-notes ul {
+  display: grid;
+  gap: var(--spacing-xxs);
+  margin: var(--spacing-sm) 0 0;
+  padding-left: 18px;
+}

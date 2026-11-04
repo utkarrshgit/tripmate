@@ -1,17 +1,18 @@
 from app.agents.base import BaseAgent
 from app.agents.context import RunContext
 from app.agents.state import AgentState
+from app.agents.transport_agent import estimate_for
 
 
 class FoodAgent(BaseAgent):
-    """Budgets meals, and lists the catalog's places to eat. No model needed."""
+    """Budgets meals at the destination's typical cost a day, and lists the catalog's places to eat. No model needed."""
 
     name = "food"
 
     async def run(self, state: AgentState, ctx: RunContext) -> AgentState:
         days = max(state.get("days", 3), 1)
         travelers = max(state.get("travelers", 1), 1)
-        daily_per_person = 600
+        daily_per_person = estimate_for(state, ctx).food_per_person_day
         total = days * travelers * daily_per_person
 
         state["food_options"] = [

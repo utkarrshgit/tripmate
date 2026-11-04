@@ -1,35 +1,16 @@
 from app.agents.base import BaseAgent
 from app.agents.context import RunContext
 from app.agents.state import AgentState
+from app.agents.transport_agent import estimate_for
 
 
 class HotelAgent(BaseAgent):
+    """Prices rooms (one per two people) night by night, following the season, festivals and weekends."""
+
     name = "hotel"
 
     async def run(self, state: AgentState, ctx: RunContext) -> AgentState:
-        days = max(state.get("days", 3), 1)
-        travelers = max(state.get("travelers", 1), 1)
-
-        # MVP estimate: one room per two travelers.
-        rooms = (travelers + 1) // 2
-        nightly = 1800
-        total = rooms * nightly * max(days - 1, 1)
-
-        state["hotel_options"] = [
-            {
-                "name": "Budget stay",
-                "category": "budget",
-                "nightly_rate": nightly,
-                "rooms": rooms,
-                "estimated_total": total,
-            },
-            {
-                "name": "Comfort stay",
-                "category": "mid-range",
-                "nightly_rate": 3000,
-                "rooms": rooms,
-                "estimated_total": 3000 * rooms * max(days - 1, 1),
-            },
-        ]
-        state["estimated_hotel_cost"] = float(total)
+        stays = estimate_for(state, ctx).stays
+        state["hotel_options"] = stays
+        state["estimated_hotel_cost"] = float(stays[0]["estimated_total"])  # the budget stay counts
         return self.mark_completed(state)
