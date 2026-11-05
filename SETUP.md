@@ -10,20 +10,29 @@ After installing the [prerequisites](#1-install-the-prerequisites) and [getting 
 ./run.sh
 ```
 
-It installs everything the first time (and skips that on later runs), creates `backend/.env`, starts the API and the website, and prints the address to open. **Ctrl+C stops both.**
+It installs everything the first time (and skips that on later runs), creates `backend/.env`, sets up the database, asks whether to plan with the **real AI models** or **mock data**, starts the API and the website, and prints the address, a demo log-in and prompts to try. **Ctrl+C stops everything it started and unloads the AI models from memory.**
 
 | Command | What it does |
 |---|---|
-| `./run.sh` | Set up if needed, then start the API and the website |
+| `./run.sh` | Set up if needed, ask real or mock, then start |
+| `./run.sh --real` | Start with the local AI models (checks Ollama and the models; asks before downloading anything) |
+| `./run.sh --mock` | Start with mock data: rules and TripMate's guide, no AI needed |
 | `./run.sh setup` | Install everything without starting |
 | `./run.sh test` | Run the backend tests and check the website builds |
+| `./run.sh stop` | Stop anything a previous run left behind, and unload the models |
+
+For a presentation, follow [DEMO.md](DEMO.md).
 
 It handles the common problems for you:
 - **Missing or too-old Python or Node:** stops with a download link.
 - **Changed dependencies:** reinstalls only what changed.
 - **`npm ci` fails:** falls back to `npm install`.
 - **Busy ports:** uses the next free one and points the website at the right API.
-- **API fails to start:** shows the error.
+- **API fails to start:** shows the error, and still opens the website, which says the planner is unavailable until the API is back.
+- **The API or website stops while running:** starts it again, up to 3 times each.
+- **Install or database setup fails:** carries on with what's already installed, and says what won't work.
+- **No `curl`:** uses Python instead.
+- **Ollama or a model is missing in real mode:** asks before installing or downloading, and runs in mock mode if you'd rather not.
 
 API logs go to `.run/api.log`.
 

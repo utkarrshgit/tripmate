@@ -16,9 +16,14 @@ async function request(path, options) {
     throw new ApiError("We can't reach the trip planner right now.", { unreachable: true });
   }
   if (!response.ok) {
-    throw new ApiError("We couldn't plan this trip.", { status: response.status });
+    const body = await response.json().catch(() => null);
+    throw new ApiError(body?.error?.message ?? "We couldn't plan this trip. Try again.", { status: response.status });
   }
-  return response.json();
+  try {
+    return await response.json();
+  } catch {
+    throw new ApiError("The planner sent back something we couldn't read. Try again.", { status: response.status });
+  }
 }
 
 export async function checkHealth() {
@@ -59,26 +64,36 @@ export async function planTripStream(query, dates, onStep) {
   }
   if (!response.ok || !response.body) return planTrip(query, dates);
 
-  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-  let buffer = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    buffer += value;
-    let end;
-    while ((end = buffer.indexOf("\n\n")) !== -1) {
-      const block = buffer.slice(0, end);
-      buffer = buffer.slice(end + 2);
-      const name = /^event: (.*)$/m.exec(block)?.[1];
-      const data = /^data: (.*)$/m.exec(block)?.[1];
-      if (!name || !data) continue;
-      const payload = JSON.parse(data);
-      if (name === "step") onStep?.(payload);
-      else if (name === "result") return payload;
-      else if (name === "error") throw new ApiError(payload.message);
+  try {
+    const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buffer = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += value;
+      let end;
+      while ((end = buffer.indexOf("\n\n")) !== -1) {
+        const block = buffer.slice(0, end);
+        buffer = buffer.slice(end + 2);
+        const name = /^event: (.*)$/m.exec(block)?.[1];
+        const data = /^data: (.*)$/m.exec(block)?.[1];
+        if (!name || !data) continue;
+        let payload;
+        try {
+          payload = JSON.parse(data);
+        } catch {
+          continue; // a garbled event: skip it, the plan still arrives
+        }
+        if (name === "step") onStep?.(payload);
+        else if (name === "result") return payload;
+        else if (name === "error") throw new ApiError(payload.message, { status: 500 });
+      }
     }
+  } catch (err) {
+    if (err instanceof ApiError) throw err; // the planner said what went wrong
+    // The connection dropped mid-way: ask once more, the plain way.
   }
-  throw new ApiError("We couldn't plan this trip.");
+  return planTrip(query, dates);
 }
 
 /**

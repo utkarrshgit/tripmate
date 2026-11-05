@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import router as api_v1
 from app.core.config import settings
-from app.core.errors import install_error_handlers
+from app.core.errors import CatchAllMiddleware, install_error_handlers
 from app.services.health_service import check_health
 from app.schemas.pricing import PriceRequest, PriceResponse
 from app.schemas.trip import TripRequest, TripResponse
@@ -28,6 +28,9 @@ app = FastAPI(
     version=settings.app_version,
     description="Multi-agent AI travel planner.",
 )
+
+# Added before CORS, so CORS wraps it and even error responses carry CORS headers.
+app.add_middleware(CatchAllMiddleware)
 
 # Only the website may call the API with cookies (CORS_ORIGINS in .env; run.sh sets it to the website's port).
 # A wildcard origin can't be used with cookies: browsers refuse to send them.

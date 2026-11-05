@@ -40,9 +40,14 @@ async def ollama_status() -> dict:
 async def check_health() -> dict:
     db = await database_status()
     ollama = await ollama_status()
+    from app.llm.gateway import answers, vectors
+    from app.services.trip_service import catalog_cache
+
     return {
         "status": "ok" if db["ok"] and ollama["ok"] else "degraded",
         "service": settings.app_name,
+        "ai_enabled": settings.ai_enabled,
         "database": db,
         "ollama": ollama,
+        "cache": {"model_answers": answers.stats(), "vectors": vectors.stats(), "catalog": catalog_cache.stats()},
     }

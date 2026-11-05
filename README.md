@@ -57,6 +57,8 @@ TripMate is an early-stage project. Today:
 | Change it in words | ✅ "Make day 2 more relaxed" or "swap the bazaars for the Hawa Mahal" makes a new version, with Undo. Exact commands are done straight away; the local model handles the rest |
 | Search by meaning | ✅ Search your trips ("somewhere with sea and sand") and find similar destinations, with a local embedding model; plain word search when it's off |
 | AI activity | ✅ For admins: every planning run and model call, with success rates, timings and tokens per planner and model |
+| Price estimates | ✅ Per destination, adjusted for the travel dates (peak and off season, Christmas, Diwali and Holi, weekends, how far ahead) and the group (shared rooms and cabs), with the reasons shown |
+| Demo | ✅ `./run.sh --real` or `--mock`, a demo account, and prompts that show each feature: see [DEMO.md](DEMO.md) |
 | Privacy Policy and Terms | ⚠️ Drafts with placeholders, pending legal review |
 | Photos | ⚠️ Image slots are in place; photos to be added |
 

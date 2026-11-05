@@ -46,4 +46,7 @@ async def seed_catalog(session: AsyncSession) -> dict[str, int]:
             places_written += 1
 
     await session.commit()
+    from app.services.trip_service import catalog_cache
+
+    catalog_cache.clear()  # plans see the refreshed catalog straight away
     return {"interests": len(INTERESTS), "destinations": len(DESTINATIONS), "places": places_written}

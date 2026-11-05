@@ -55,6 +55,7 @@ export function SessionProvider({ children }) {
   const [user, setUser] = useState(null);
   const [trips, setTrips] = useState([]);
   const [tripsLoaded, setTripsLoaded] = useState(false);
+  const [tripsError, setTripsError] = useState(null);
   // How many browser-saved trips were just moved into the account, for a one-time notice.
   const [imported, setImported] = useState(0);
 
@@ -72,8 +73,10 @@ export function SessionProvider({ children }) {
     }
     try {
       setTrips((await tripsApi.listTrips()).trips);
-    } catch {
+      setTripsError(null);
+    } catch (err) {
       setTrips([]);
+      setTripsError(err.message); // say so, rather than show "Nothing saved yet"
     }
     setTripsLoaded(true);
   }, []);
@@ -232,7 +235,14 @@ export function SessionProvider({ children }) {
     setTrips((list) => list.filter((t) => t.id !== id));
   }, []);
 
-  const refreshTrips = useCallback(async () => setTrips((await tripsApi.listTrips()).trips), []);
+  const refreshTrips = useCallback(async () => {
+    try {
+      setTrips((await tripsApi.listTrips()).trips);
+      setTripsError(null);
+    } catch (err) {
+      setTripsError(err.message);
+    }
+  }, []);
 
   const exportData = useCallback(() => authApi.exportAccount(), []);
 
@@ -257,6 +267,7 @@ export function SessionProvider({ children }) {
       changePassword,
       deleteAccount,
       tripsLoaded,
+      tripsError,
       imported,
       dismissImported: () => setImported(0),
       saveTrip,
@@ -285,6 +296,7 @@ export function SessionProvider({ children }) {
       changePassword,
       deleteAccount,
       tripsLoaded,
+      tripsError,
       imported,
       saveTrip,
       tripChanged,

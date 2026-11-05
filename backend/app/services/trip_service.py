@@ -13,6 +13,7 @@ from sqlalchemy.orm import selectinload
 
 from app.agents.context import Progress, RunContext, _no_progress
 from app.agents.supervisor import SupervisorAgent
+from app.core.cache import MISS, TTLCache
 from app.core.logger import get_logger
 from app.db.session import SessionLocal
 from app.llm.gateway import Gateway
@@ -21,9 +22,28 @@ from app.models import AgentRun, Destination, LlmCall
 logger = get_logger("trips")
 
 
+# The same destination is looked up on every plan for it: keep it for five minutes.
+catalog_cache = TTLCache(size=64, ttl=5 * 60)
+
+
 async def load_catalog(name: str) -> dict | None:
     """The destination and its places, matched by name or slug, or None (also when the database is down)."""
     key = name.strip().lower()
+    if (hit := catalog_cache.get(key)) is not MISS:
+        return hit
+    try:
+        found = await _load_catalog(key)
+    except _Unavailable:
+        return None  # the database is down: don't remember that, try again next time
+    catalog_cache.set(key, found)
+    return found
+
+
+class _Unavailable(Exception):
+    pass
+
+
+async def _load_catalog(key: str) -> dict | None:
     try:
         async with SessionLocal() as db:
             dest = await db.scalar(
@@ -33,7 +53,7 @@ async def load_catalog(name: str) -> dict | None:
             )
     except Exception as exc:  # noqa: BLE001 - planning must never fail because of the catalog
         logger.warning("Catalog unavailable (%s); planning without it", type(exc).__name__)
-        return None
+        raise _Unavailable from exc
     if dest is None:
         return None
     return {
@@ -72,6 +92,7 @@ def to_response(result: dict, run_id: uuid.UUID | None) -> dict:
         "activities": result.get("activities", []),
         "food_options": result.get("food_options", []),
         "food_places": result.get("food_places", []),
+        "estimate_notes": result.get("estimate_notes", []),
         "cost_breakdown": {
             "transport": result.get("estimated_transport_cost", 0),
             "hotel": result.get("estimated_hotel_cost", 0),

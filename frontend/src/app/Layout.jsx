@@ -3,6 +3,7 @@ import { Route, Routes, matchRoutes, useLocation } from "react-router-dom";
 import Footer from "@/components/layout/Footer";
 import Nav from "@/components/layout/Nav";
 import { AuthModal } from "@/features/auth";
+import ErrorBoundary from "./ErrorBoundary";
 import { ROUTES } from "./routes";
 import { useHead } from "./useHead";
 import "./app.css";
@@ -34,7 +35,9 @@ export default function Layout() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <Nav />
+      <ErrorBoundary level="quiet">
+        <Nav />
+      </ErrorBoundary>
       <main id="main">
         {/* Keyed by path so each page plays the enter transition */}
         <div key={pathname} className="page-enter">
@@ -44,17 +47,23 @@ export default function Layout() {
                 key={path}
                 path={path}
                 element={
-                  <Suspense fallback={<Fallback />}>
-                    <Page />
-                  </Suspense>
+                  <ErrorBoundary key={pathname}>
+                    <Suspense fallback={<Fallback />}>
+                      <Page />
+                    </Suspense>
+                  </ErrorBoundary>
                 }
               />
             ))}
           </Routes>
         </div>
       </main>
-      <Footer />
-      <AuthModal />
+      <ErrorBoundary level="quiet">
+        <Footer />
+      </ErrorBoundary>
+      <ErrorBoundary level="quiet">
+        <AuthModal />
+      </ErrorBoundary>
     </>
   );
 }
