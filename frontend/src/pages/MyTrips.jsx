@@ -118,7 +118,7 @@ function TripSearch({ onResults }) {
 }
 
 export default function MyTrips() {
-  const { user, trips, tripsLoaded, imported, dismissImported, deleteTrip } = useSession();
+  const { user, trips, tripsLoaded, tripsError, refreshTrips, imported, dismissImported, deleteTrip } = useSession();
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleteError, setDeleteError] = useState(null);
   const [search, setSearch] = useState(null); // { q, mode, results } while searching
@@ -127,6 +127,18 @@ export default function MyTrips() {
     return <SignedOutPrompt title="Your trips" body="Log in to view your saved trips." />;
   }
   if (!tripsLoaded) return <GridSkeleton />;
+  if (tripsError && !trips.length) {
+    return (
+      <div className="container section">
+        <Notice tone="error" icon="alert" title="We couldn't load your trips">
+          <p className="t-body-sm">{tripsError}</p>
+          <div>
+            <Button onClick={refreshTrips}>Try again</Button>
+          </div>
+        </Notice>
+      </div>
+    );
+  }
 
   return (
     <div className="container">

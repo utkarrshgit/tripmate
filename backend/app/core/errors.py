@@ -37,3 +37,67 @@ def install_error_handlers(app: FastAPI) -> None:
             {"error": {"code": "invalid", "message": "Check the highlighted fields.", "field": first, "fields": fields}},
             status_code=422,
         )
+
+
+# ---- The last line of defence ----------------------------------------------------
+
+def _is_database_down(exc: BaseException) -> bool:
+    """Connection problems with PostgreSQL (not mistakes in a query)."""
+    from sqlalchemy.exc import DBAPIError, InterfaceError, OperationalError
+    from sqlalchemy.exc import TimeoutError as PoolTimeout
+
+    import socket
+
+    # ConnectionError covers a refused or dropped connection; gaierror a database host that doesn't resolve.
+    if isinstance(exc, (OperationalError, InterfaceError, PoolTimeout, ConnectionError, socket.gaierror)):
+        return True
+    if isinstance(exc, DBAPIError) and exc.connection_invalidated:
+        return True
+    name = type(exc).__name__
+    return name in {"CannotConnectNowError", "ConnectionDoesNotExistError", "InvalidCatalogNameError", "TooManyConnectionsError"}
+
+
+def error_for(exc: BaseException) -> tuple[int, dict]:
+    if _is_database_down(exc):
+        return 503, {
+            "error": {
+                "code": "database_unavailable",
+                "message": "Accounts and saved trips aren't available right now. You can still plan trips. Try again in a minute.",
+                "field": None,
+            }
+        }
+    return 500, {"error": {"code": "server_error", "message": "Something went wrong on our side. Try again.", "field": None}}
+
+
+class CatchAllMiddleware:
+    """Turns any unhandled error into the usual JSON error, so the website always gets a message it can show.
+
+    It sits inside the CORS middleware, so even these responses carry CORS headers (the browser
+    would otherwise report a network error and hide the message). Errors after a response has
+    started (a stream already sending) can't be changed; they're logged.
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            return await self.app(scope, receive, send)
+        started = False
+
+        async def tracking_send(message):
+            nonlocal started
+            if message["type"] == "http.response.start":
+                started = True
+            await send(message)
+
+        try:
+            await self.app(scope, receive, tracking_send)
+        except Exception as exc:  # noqa: BLE001 - this is the catch-all
+            from app.core.logger import get_logger
+
+            get_logger("errors").exception("Unhandled error on %s %s", scope.get("method"), scope.get("path"))
+            if started:
+                return
+            status, body = error_for(exc)
+            await JSONResponse(body, status_code=status)(scope, receive, send)

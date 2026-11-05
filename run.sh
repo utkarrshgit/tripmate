@@ -34,21 +34,53 @@ ask()  {  # ask "question" → 0 for yes; anything else (or no terminal) is no
   case "$reply" in [yY]|[yY][eE][sS]) return 0 ;; *) return 1 ;; esac
 }
 
+# One HTTP request: http METHOD URL [JSON]. Uses curl, or Python's urllib when there's no curl.
+# Returns 0 for a 2xx answer and prints the body; never stops the script.
+http() {
+  if command -v curl >/dev/null; then
+    if [ -n "${3:-}" ]; then curl -fsS -m 10 -X "$1" "$2" -H 'Content-Type: application/json' -d "$3" 2>/dev/null
+    else curl -fsS -m 5 -X "$1" "$2" 2>/dev/null; fi
+    return
+  fi
+  local py; py="$(command -v python3 || command -v python || true)"; [ -n "$py" ] || return 1
+  "$py" - "$1" "$2" "${3:-}" <<'PYEOF' 2>/dev/null
+import sys, urllib.request
+method, url, body = sys.argv[1], sys.argv[2], sys.argv[3]
+req = urllib.request.Request(url, data=body.encode() if body else None, method=method, headers={"Content-Type": "application/json"})
+with urllib.request.urlopen(req, timeout=10) as r:
+    sys.stdout.write(r.read().decode())
+PYEOF
+}
+
 # --- Stopping: every process this script starts, and the models' memory ------
-# Kills a process and its children (uvicorn --reload runs a worker under a watcher).
+# Kills a process and its children.
 kill_tree() {
   local pid="$1" child
   for child in $(pgrep -P "$pid" 2>/dev/null); do kill_tree "$child"; done
   kill "$pid" 2>/dev/null || true
 }
-ollama_up() { curl -fsS -m 2 "$OLLAMA_URL/api/version" >/dev/null 2>&1; }
+# Frees a port held by a TripMate server from this folder that lost its parent (after a crash
+# or a forced kill). Anything else on the port, like another project's server, is left alone.
+free_our_port() {
+  command -v lsof >/dev/null || return 0
+  local pid cwd
+  for pid in $(lsof -t -nP -iTCP:"$1" -sTCP:LISTEN 2>/dev/null); do
+    cwd="$(lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p')"
+    case "$cwd" in "$ROOT"/*) ;; *) continue ;; esac
+    ps -o command= -p "$pid" 2>/dev/null | grep -Eq "uvicorn app.main|vite" || continue
+    kill "$pid" 2>/dev/null || true
+  done
+  local tries=0
+  while lsof -t -nP -iTCP:"$1" -sTCP:LISTEN >/dev/null 2>&1 && [ "$tries" -lt 10 ]; do sleep 0.3; tries=$((tries + 1)); done
+}
+ollama_up() { http GET "$OLLAMA_URL/api/version" >/dev/null; }
 # Asks Ollama to drop the models from memory now (keep_alive 0) instead of in 30 minutes.
 unload_models() {
   ollama_up || return 0
   local m
   for m in $MODELS; do
-    curl -fsS -m 10 "$OLLAMA_URL/api/generate" -d "{\"model\":\"$m\",\"keep_alive\":0}" >/dev/null 2>&1 \
-      || curl -fsS -m 10 "$OLLAMA_URL/api/embed" -d "{\"model\":\"$m\",\"input\":\"\",\"keep_alive\":0}" >/dev/null 2>&1 || true
+    http POST "$OLLAMA_URL/api/generate" "{\"model\":\"$m\",\"keep_alive\":0}" >/dev/null \
+      || http POST "$OLLAMA_URL/api/embed" "{\"model\":\"$m\",\"input\":\"\",\"keep_alive\":0}" >/dev/null || true
   done
 }
 stop_all() {  # everything listed in .run/pids (this run's, or a previous run's)
@@ -57,6 +89,7 @@ stop_all() {  # everything listed in .run/pids (this run's, or a previous run's)
     while read -r pid; do [ -n "$pid" ] && kill_tree "$pid"; done < "$STATE/pids"
     rm -f "$STATE/pids"
   fi
+  free_our_port "${API_PORT:-8000}"; free_our_port "${WEB_PORT:-5173}"
   unload_models
   if [ -f "$STATE/ollama.pid" ]; then  # Ollama, only if this script started it
     kill_tree "$(cat "$STATE/ollama.pid")"; rm -f "$STATE/ollama.pid"
@@ -88,8 +121,13 @@ VPY="$BIN/python"
 if changed requirements-dev.txt backend || changed requirements.txt backend-base; then
   say "Installing backend packages"
   "$VPY" -m pip install -q --upgrade pip
-  "$VPY" -m pip install -q -r requirements-dev.txt || fail "pip install failed — see the error above"
-  stamp requirements-dev.txt backend; stamp requirements.txt backend-base
+  if "$VPY" -m pip install -q -r requirements-dev.txt; then
+    stamp requirements-dev.txt backend; stamp requirements.txt backend-base
+  elif "$VPY" -c "import fastapi, sqlalchemy, httpx" 2>/dev/null; then
+    say "Couldn't update the backend packages (offline?) — carrying on with the ones already installed"
+  else
+    fail "pip install failed and nothing is installed yet — check your internet connection and the error above"
+  fi
 fi
 [ -f .env ] || { say "Creating backend/.env from .env.example"; cp .env.example .env; }
 
@@ -110,15 +148,21 @@ db_status=0; setup_db > "$STATE/db.log" 2>&1 || db_status=$?
 case "$db_status" in
   0) say "Database ready" ;;
   2) say "PostgreSQL isn't running, so accounts and saved trips won't work yet. Start it with: brew services start postgresql@18" ;;
-  *) tail -n 15 "$STATE/db.log"; fail "Database setup failed — error above (full log: .run/db.log)" ;;
+  *) tail -n 8 "$STATE/db.log"
+     say "Database setup didn't finish (full log: .run/db.log). Starting anyway: planning works, accounts and saved trips may not." ;;
 esac
 
 # --- Frontend ---------------------------------------------------------------
 cd "$ROOT/frontend"
 if [ ! -d node_modules ] || changed package-lock.json frontend; then
   say "Installing website packages"
-  npm ci --no-audit --no-fund || { say "npm ci failed — falling back to npm install"; npm install --no-audit --no-fund; }
-  stamp package-lock.json frontend
+  if npm ci --no-audit --no-fund || { say "npm ci failed — falling back to npm install"; npm install --no-audit --no-fund; }; then
+    stamp package-lock.json frontend
+  elif [ -x node_modules/.bin/vite ]; then
+    say "Couldn't update the website packages (offline?) — carrying on with the ones already installed"
+  else
+    fail "npm install failed and nothing is installed yet — check your internet connection and the error above"
+  fi
 fi
 
 case "$MODE" in
@@ -170,7 +214,7 @@ prepare_real() {
     until ollama_up; do tries=$((tries + 1)); [ "$tries" -lt 30 ] || { say "Ollama didn't start — using mock data instead"; return 1; }; sleep 0.5; done
   fi
   local installed missing="" m
-  installed="$(curl -fsS -m 5 "$OLLAMA_URL/api/tags" 2>/dev/null)"
+  installed="$(http GET "$OLLAMA_URL/api/tags" || true)"
   for m in $MODELS; do printf '%s' "$installed" | grep -q "\"$m\"" || missing="$missing $m"; done
   if [ -n "$missing" ]; then
     say "These models aren't on this computer yet:$missing"
@@ -214,10 +258,9 @@ while True:
     p += 1
 EOF
 }
+stop_all  # anything a previous run left behind, so the usual ports are free again
 API_PORT="$(free_port 8000)"; WEB_PORT="$(free_port 5173)"
-
-stop_all  # anything a previous run left behind
-PIDS=()
+API_PID=""; WEB_PID=""
 cleanup() {
   trap - EXIT
   say "Stopping"
@@ -228,27 +271,40 @@ cleanup() {
 trap cleanup EXIT                 # every way out stops both servers…
 trap 'exit 130' INT TERM HUP      # …including Ctrl+C, kill, or closing the terminal
 
-say "Starting API on :$API_PORT (log: .run/api.log)"
-# The API accepts cookies only from the website's own address.
-(cd "$ROOT/backend" && AI_ENABLED="$AI_ENABLED" CORS_ORIGINS="http://localhost:$WEB_PORT,http://127.0.0.1:$WEB_PORT" exec "$VPY" -m uvicorn app.main:app --reload --port "$API_PORT") > "$STATE/api.log" 2>&1 &
-PIDS+=($!); echo $! >> "$STATE/pids"
+start_api() {
+  free_our_port "$API_PORT"
+  # The API accepts cookies only from the website's own address. No --reload: one process,
+  # so a crash never leaves a worker behind holding the port.
+  (cd "$ROOT/backend" && AI_ENABLED="$AI_ENABLED" CORS_ORIGINS="http://localhost:$WEB_PORT,http://127.0.0.1:$WEB_PORT" exec "$VPY" -m uvicorn app.main:app --port "$API_PORT") >> "$STATE/api.log" 2>&1 &
+  API_PID=$!; echo "$API_PID" >> "$STATE/pids"
+}
+start_web() {
+  free_our_port "$WEB_PORT"
+  VITE_API_URL="http://localhost:$API_PORT" node_modules/.bin/vite --port "$WEB_PORT" --strictPort >> "$STATE/web.log" 2>&1 &
+  WEB_PID=$!; echo "$WEB_PID" >> "$STATE/pids"
+}
+# Waits for /health (up to 30 s). Returns 1, with the log's last lines, if the API doesn't come up.
+api_ready() {
+  local tries=0
+  until http GET "http://127.0.0.1:$API_PORT/health" >/dev/null; do
+    if ! kill -0 "$API_PID" 2>/dev/null; then
+      tail -n 15 "$STATE/api.log"; return 1
+    fi
+    tries=$((tries + 1)); [ "$tries" -lt 60 ] || { tail -n 15 "$STATE/api.log"; return 1; }
+    sleep 0.5
+  done
+}
 
-# Wait for /health (up to 30 s); show the log if it never comes up.
-healthy() { "$ROOT/backend/$VPY" -c "import urllib.request as u; u.urlopen('http://127.0.0.1:$API_PORT/health', timeout=1)" 2>/dev/null; }
-tries=0
-until healthy; do
-  # With --reload the watcher survives an import error, so also look for a traceback in the log.
-  if ! kill -0 "${PIDS[0]}" 2>/dev/null || grep -q "Traceback" "$STATE/api.log"; then
-    tail -n 15 "$STATE/api.log"; fail "API failed to start — error above (full log: .run/api.log)"
-  fi
-  tries=$((tries + 1)); [ "$tries" -lt 60 ] || { tail -n 20 "$STATE/api.log"; fail "API didn't answer on :$API_PORT within 30 s"; }
-  sleep 0.5
-done
+: > "$STATE/api.log"; : > "$STATE/web.log"
+say "Starting API on :$API_PORT (log: .run/api.log)"
+start_api
+if ! api_ready; then
+  say "The API didn't start (error above, full log: .run/api.log). The website will still open, and shows a friendly “unavailable” page until it does."
+fi
 
 say "Starting website on :$WEB_PORT"
-VITE_API_URL="http://localhost:$API_PORT" node_modules/.bin/vite --port "$WEB_PORT" --strictPort > "$STATE/web.log" 2>&1 &
-PIDS+=($!); echo $! >> "$STATE/pids"
-tries=0; until curl -fsS -m 1 "http://127.0.0.1:$WEB_PORT" >/dev/null 2>&1; do tries=$((tries + 1)); [ "$tries" -lt 40 ] || break; sleep 0.5; done
+start_web
+tries=0; until http GET "http://127.0.0.1:$WEB_PORT" >/dev/null; do tries=$((tries + 1)); [ "$tries" -lt 40 ] || break; sleep 0.5; done
 
 echo
 say "TripMate is running → http://localhost:$WEB_PORT   (API docs: http://localhost:$API_PORT/docs)"
@@ -258,13 +314,34 @@ else
   note "Mode: mock data. Plans use rules and TripMate's guide: instant and predictable. Run ./run.sh --real for the AI models."
 fi
 if [ "$DEMO_READY" = "1" ]; then
-  (cd "$ROOT/backend" && "$VPY" -m app.cli demo-account)
+  (cd "$ROOT/backend" && "$VPY" -m app.cli demo-account) || true
 fi
 echo
 say "Try these on the Plan a trip page:"
-(cd "$ROOT/backend" && "$VPY" -m app.cli demo-prompts $([ "$DATA" = "real" ] && echo --real))
+(cd "$ROOT/backend" && "$VPY" -m app.cli demo-prompts $([ "$DATA" = "real" ] && echo --real)) || note "(Couldn't print the prompts: see DEMO.md.)"
 echo
 note "Full walkthrough: DEMO.md · Ctrl+C stops everything and frees the memory"
-# Keep running until either process stops, then the EXIT trap stops the other.
-while kill -0 "${PIDS[0]}" 2>/dev/null && kill -0 "${PIDS[1]}" 2>/dev/null; do sleep 1; done
-say "A server stopped — see .run/api.log or the output above"
+# Keep both running: a server that stops is started again (up to 3 times each), so one crash
+# doesn't end the demo. The website keeps running even if the API gives up.
+API_RESTARTS=0; WEB_RESTARTS=0; API_GAVE_UP=0
+while :; do
+  sleep 1
+  if [ "$API_GAVE_UP" = "0" ] && ! kill -0 "$API_PID" 2>/dev/null; then
+    if [ "$API_RESTARTS" -lt 3 ]; then
+      API_RESTARTS=$((API_RESTARTS + 1))
+      say "The API stopped — starting it again ($API_RESTARTS of 3). Last lines of .run/api.log:"; tail -n 5 "$STATE/api.log"
+      start_api; api_ready || true
+    else
+      API_GAVE_UP=1
+      say "The API keeps stopping (see .run/api.log). The website stays up and shows a friendly “unavailable” page. Fix the error, then Ctrl+C and start again."
+    fi
+  fi
+  if ! kill -0 "$WEB_PID" 2>/dev/null; then
+    if [ "$WEB_RESTARTS" -lt 3 ]; then
+      WEB_RESTARTS=$((WEB_RESTARTS + 1))
+      say "The website stopped — starting it again ($WEB_RESTARTS of 3)."; start_web
+    else
+      say "The website keeps stopping (see .run/web.log) — stopping."; exit 1
+    fi
+  fi
+done

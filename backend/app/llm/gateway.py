@@ -85,6 +85,9 @@ class Gateway:
             return None, "timed out"
         except (httpx.HTTPError, json.JSONDecodeError) as exc:
             return None, type(exc).__name__
+        except Exception as exc:  # noqa: BLE001 - a model problem must never break a plan
+            logger.exception("Unexpected error calling Ollama")
+            return None, type(exc).__name__
 
     async def extract[T: BaseModel](self, agent: str, schema: type[T], system: str, prompt: str, *, timeout: float = 45) -> T | None:
         """Asks the general model for JSON matching `schema`. One retry, then None."""
@@ -195,5 +198,5 @@ async def warm_up() -> None:
         async with httpx.AsyncClient(timeout=120) as client:
             await client.post(f"{base}/api/generate", json={"model": settings.ollama_llm_model, "keep_alive": "30m"})
         logger.info("Loaded %s", settings.ollama_llm_model)
-    except httpx.HTTPError as exc:
+    except Exception as exc:  # noqa: BLE001 - warming up must never stop the API starting
         logger.warning("Couldn't load %s (%s); plans will use rules until Ollama is running", settings.ollama_llm_model, type(exc).__name__)

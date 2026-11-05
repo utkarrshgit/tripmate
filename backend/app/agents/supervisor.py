@@ -75,25 +75,86 @@ class SupervisorAgent:
             state["end_date"] = end_date.isoformat()
 
         for agent in self.pipeline:
-            await ctx.progress(agent.name, "start", {})
+            await self._safe_progress(ctx, agent.name, "start", {})
             calls_before = len(ctx.gateway.calls)
-            state = await agent.run(state, ctx)
+            state = await self._run_safely(agent, state, ctx)
             calls = ctx.gateway.calls[calls_before:]
-            await ctx.progress(
+            await self._safe_progress(
+                ctx,
                 agent.name,
                 "done",
                 {
                     "ai": any(c.ok for c in calls),
                     "fell_back": bool(calls) and not any(c.ok for c in calls),
                     "models": sorted({c.model for c in calls if c.ok}),
-                    "summary": self._step_summary(agent.name, state),
+                    "summary": self._safe_summary(agent.name, state),
                 },
             )
 
-        state["final_response"] = self._build_response(state)
+        try:
+            state["final_response"] = self._build_response(state)
+        except Exception:  # noqa: BLE001
+            self.logger.exception("Couldn't write the text summary")
+            state["final_response"] = ""
         state["ai"] = ctx.gateway.summary()
         self.logger.info("Trip completed by agents: %s (AI: %s)", state["completed_agents"], state["ai"])
         return state
+
+    # What a step leaves behind when it can't run at all, so later steps and the website still work.
+    _DEFAULTS = {
+        "destination": {"destination_info": {}},
+        "transport": {"transport_options": [], "estimated_transport_cost": 0.0},
+        "hotel": {"hotel_options": [], "estimated_hotel_cost": 0.0},
+        "activity": {"activities": [], "estimated_activity_cost": 0.0},
+        "food": {"food_options": [], "food_places": [], "estimated_food_cost": 0.0},
+        "budget": {"total_cost": 0.0},
+        "itinerary": {"itinerary": []},
+    }
+    _LABELS = {
+        "planner": "reading your request",
+        "destination": "the destination details",
+        "transport": "getting there",
+        "hotel": "stays",
+        "activity": "things to do",
+        "food": "food",
+        "budget": "the total",
+        "itinerary": "the day-by-day plan",
+        "critic": "the final check",
+    }
+
+    async def _run_safely(self, agent, state: AgentState, ctx: RunContext) -> AgentState:
+        """Runs one agent. If it fails, tries once more with rules only; if that fails too, keeps
+        going with safe defaults and says so in the plan. One part never stops the whole plan."""
+        snapshot = dict(state)
+        try:
+            return await agent.run(state, ctx)
+        except Exception:  # noqa: BLE001
+            self.logger.exception("%s failed; trying again with rules only", agent.name)
+        gateway_on = ctx.gateway.enabled
+        try:
+            ctx.gateway.enabled = False
+            return await agent.run(dict(snapshot), ctx)
+        except Exception:  # noqa: BLE001
+            self.logger.exception("%s failed again; using defaults", agent.name)
+        finally:
+            ctx.gateway.enabled = gateway_on
+        state = {**snapshot, **self._DEFAULTS.get(agent.name, {})}
+        state.setdefault("issues", []).append(f"We couldn't work out {self._LABELS.get(agent.name, agent.name)} this time, so that part is left simple. Try planning again.")
+        return state
+
+    @staticmethod
+    async def _safe_progress(ctx: RunContext, agent: str, phase: str, details: dict) -> None:
+        try:
+            await ctx.progress(agent, phase, details)
+        except Exception:  # noqa: BLE001 - a lost progress message mustn't stop the plan
+            pass
+
+    @classmethod
+    def _safe_summary(cls, agent: str, state: AgentState) -> str:
+        try:
+            return cls._step_summary(agent, state)
+        except Exception:  # noqa: BLE001
+            return ""
 
     @staticmethod
     def _step_summary(agent: str, state: AgentState) -> str:

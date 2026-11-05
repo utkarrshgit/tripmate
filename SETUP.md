@@ -28,7 +28,10 @@ It handles the common problems for you:
 - **Changed dependencies:** reinstalls only what changed.
 - **`npm ci` fails:** falls back to `npm install`.
 - **Busy ports:** uses the next free one and points the website at the right API.
-- **API fails to start:** shows the error.
+- **API fails to start:** shows the error, and still opens the website, which says the planner is unavailable until the API is back.
+- **The API or website stops while running:** starts it again, up to 3 times each.
+- **Install or database setup fails:** carries on with what's already installed, and says what won't work.
+- **No `curl`:** uses Python instead.
 - **Ollama or a model is missing in real mode:** asks before installing or downloading, and runs in mock mode if you'd rather not.
 
 API logs go to `.run/api.log`.

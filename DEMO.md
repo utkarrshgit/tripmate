@@ -87,6 +87,20 @@ A small in-memory cache (`backend/app/core/cache.py`) keeps:
 
 The same plan or search a second time takes about a second instead of 20. `/health` shows hit rates, and reloading the catalog clears its cache.
 
+## Nothing stops the demo
+
+Each part fails on its own, and the rest keeps working:
+
+| If this breaks | What happens |
+|---|---|
+| Ollama or a model | The plan comes back from rules, and says so |
+| One planner (say, the day-by-day plan) | It's tried again without AI, then left simple. The rest of the plan still comes back, with a note |
+| PostgreSQL | Planning still works. Accounts and saved trips say they aren't available, instead of failing |
+| The live progress stream | The website asks for the plan in one go instead |
+| An unexpected error in the API | You get a short message to try again, not a blank screen |
+| A page on the website | Only that page shows **Something went wrong on this page** with **Try again**. The menu and other pages keep working |
+| The API or website process | `run.sh` starts it again (up to 3 times each). If the API keeps stopping, the website stays up |
+
 ## If something goes wrong
 
 | Problem | Fix |
@@ -94,4 +108,5 @@ The same plan or search a second time takes about a second instead of 20. `/heal
 | "PostgreSQL isn't running" | `brew services start postgresql@18`, then start again. The planner works without it; accounts and saved trips don't |
 | A plan takes over 30 seconds in real mode | The model is loading for the first time. Plan once before the demo |
 | Real mode switched to mock | The script couldn't use Ollama or a model. Its message says why; `./run.sh --real` asks again |
-| Something's still running after a crash | `./run.sh stop` |
+| Something's still running after a crash | `./run.sh stop`. It also frees ports 8000 and 5173 if a TripMate server from this folder still holds them |
+| "The API keeps stopping" | Read the end of `.run/api.log`, fix the error, then start again |
